@@ -14,6 +14,30 @@ class EmployeeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+
+            'worker_type' => $this->worker_type,
+            'worker_type_label' => match ($this->worker_type) {
+                'internal' => 'Empleado interno',
+                'external' => 'Maquilero externo',
+                default => 'No definido',
+            },
+
+            'phone' => $this->phone,
+            'status' => $this->status,
+            'notes' => $this->notes,
+
+            'area' => $this->whenLoaded('area', function () {
+                return [
+                    'id' => $this->area->id,
+                    'name' => $this->area->name,
+                ];
+            }),
+
+            'created_at' => $this->created_at?->toISOString(),
+            'updated_at' => $this->updated_at?->toISOString(),
+        ];
     }
 }

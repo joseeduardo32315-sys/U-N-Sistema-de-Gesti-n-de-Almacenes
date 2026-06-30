@@ -40,6 +40,7 @@ class RolePermissionSeeder extends Seeder
             'employees.create',
             'employees.update',
             'employees.deactivate',
+            'employees.activate',
 
             // Modelos de prendas
             'garment-models.view',
@@ -87,6 +88,8 @@ class RolePermissionSeeder extends Seeder
                 'employees.view',
                 'employees.create',
                 'employees.update',
+                'employees.deactivate',
+                'employees.activate',
 
                 'garment-models.view',
 

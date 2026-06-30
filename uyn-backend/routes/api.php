@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\AreaController;
+use App\Http\Controllers\Api\EmployeeController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -64,5 +66,42 @@ Route::prefix('v1')
                     'show',
                     'update',
                 ]);
+
+            Route::get('/areas', [AreaController::class, 'index'])
+                ->middleware('permission:employees.view')
+                ->name('areas.index');
+
+            Route::get('/employees', [EmployeeController::class, 'index'])
+                ->middleware('permission:employees.view')
+                ->name('employees.index');
+
+            Route::post('/employees', [EmployeeController::class, 'store'])
+                ->middleware('permission:employees.create')
+                ->name('employees.store');
+
+            Route::post('/employees/{employee}/deactivate', [
+                EmployeeController::class,
+                'deactivate',
+            ])
+                ->middleware('permission:employees.deactivate')
+                ->name('employees.deactivate');
+
+            Route::post('/employees/{employee}/activate', [
+                EmployeeController::class,
+                'activate',
+            ])
+                ->middleware('permission:employees.activate')
+                ->name('employees.activate');
+
+            Route::get('/employees/{employee}', [EmployeeController::class, 'show'])
+                ->middleware('permission:employees.view')
+                ->name('employees.show');
+
+            Route::match(['put', 'patch'], '/employees/{employee}', [
+                EmployeeController::class,
+                'update',
+            ])
+                ->middleware('permission:employees.update')
+                ->name('employees.update');
         });
     });
