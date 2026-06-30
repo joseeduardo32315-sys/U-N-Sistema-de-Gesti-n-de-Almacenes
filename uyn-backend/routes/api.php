@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\GarmentModelController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -103,5 +104,42 @@ Route::prefix('v1')
             ])
                 ->middleware('permission:employees.update')
                 ->name('employees.update');
+
+            // Rutas para Garment-Models
+            Route::get('/garment-models', [GarmentModelController::class, 'index'])
+                ->middleware('permission:garment-models.view')
+                ->name('garment-models.index');
+
+            Route::post('/garment-models', [GarmentModelController::class, 'store'])
+                ->middleware('permission:garment-models.create')
+                ->name('garment-models.store');
+
+            Route::post('/garment-models/{garment_model}/deactivate', [
+                GarmentModelController::class,
+                'deactivate',
+            ])
+                ->middleware('permission:garment-models.deactivate')
+                ->name('garment-models.deactivate');
+
+            Route::post('/garment-models/{garment_model}/activate', [
+                GarmentModelController::class,
+                'activate',
+            ])
+                ->middleware('permission:garment-models.activate')
+                ->name('garment-models.activate');
+
+            Route::get('/garment-models/{garment_model}', [
+                GarmentModelController::class,
+                'show',
+            ])
+                ->middleware('permission:garment-models.view')
+                ->name('garment-models.show');
+
+            Route::match(['put', 'patch'], '/garment-models/{garment_model}', [
+                GarmentModelController::class,
+                'update',
+            ])
+                ->middleware('permission:garment-models.update')
+                ->name('garment-models.update');
         });
     });

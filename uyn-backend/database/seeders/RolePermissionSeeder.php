@@ -47,6 +47,7 @@ class RolePermissionSeeder extends Seeder
             'garment-models.create',
             'garment-models.update',
             'garment-models.deactivate',
+            'garment-models.activate',
 
             // Cortes
             'cuts.view',
