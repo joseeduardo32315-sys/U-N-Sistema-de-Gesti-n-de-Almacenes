@@ -24,4 +24,36 @@ class Area extends Model
     {
         return $this->hasMany(GarmentCut::class, 'current_area_id');
     }
+
+    public function garmentCutComplements(): HasMany
+    {
+        return $this->hasMany(
+            GarmentCutComplement::class,
+            'current_area_id'
+        );
+    }
+
+    public function specialProcessPieces(): HasMany
+    {
+        return $this->hasMany(
+            SpecialProcessPiece::class,
+            'current_area_id'
+        );
+    }
+
+    public function outgoingProductionMovements(): HasMany
+    {
+        return $this->hasMany(
+            ProductionMovement::class,
+            'from_area_id'
+        );
+    }
+
+    public function incomingProductionMovements(): HasMany
+    {
+        return $this->hasMany(
+            ProductionMovement::class,
+            'to_area_id'
+        );
+    }
 }

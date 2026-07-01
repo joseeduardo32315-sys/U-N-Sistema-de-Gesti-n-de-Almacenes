@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GarmentCut extends Model
 {
@@ -51,5 +52,22 @@ class GarmentCut extends Model
     public function cutSizes(): HasMany
     {
         return $this->hasMany(GarmentCutSize::class);
+    }
+
+    public function complement(): HasOne
+    {
+        return $this->hasOne(GarmentCutComplement::class);
+    }
+
+    public function specialProcessPieces(): HasMany
+    {
+        return $this->hasMany(SpecialProcessPiece::class);
+    }
+
+    public function productionMovements(): HasMany
+    {
+        return $this->hasMany(
+            ProductionMovement::class
+        );
     }
 }

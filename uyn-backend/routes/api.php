@@ -12,6 +12,11 @@ use App\Http\Controllers\Api\GarmentModelController;
 use App\Http\Controllers\Api\ProductionOrderController;
 use App\Http\Controllers\Api\SizeController;
 use App\Http\Controllers\Api\GarmentCutController;
+use App\Http\Controllers\Api\PieceTypeController;
+use App\Http\Controllers\Api\ProcessController;
+use App\Http\Controllers\Api\GarmentCutClassificationController;
+use App\Http\Controllers\Api\ProductionMovementController;
+use App\Http\Controllers\Api\ProductionOperationLogController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -200,5 +205,89 @@ Route::prefix('v1')
             ])
                 ->middleware('permission:cuts.update')
                 ->name('garment-cuts.update');
-        });
+
+            // Rutas para PieceTypes y Process
+            Route::get('/processes', [ProcessController::class, 'index'])
+                ->middleware('permission:processes.view')
+                ->name('processes.index');
+
+            Route::get('/piece-types', [PieceTypeController::class, 'index'])
+                ->middleware('permission:processes.view')
+                ->name('piece-types.index');
+
+            // Rutas para garment-cuts
+            Route::get(
+                '/garment-cuts/{garment_cut}/classification',
+                [GarmentCutClassificationController::class, 'show']
+            )
+                ->middleware('permission:processes.view')
+                ->name('garment-cuts.classification.show');
+
+            Route::match(
+                ['put', 'patch'],
+                '/garment-cuts/{garment_cut}/classification',
+                [GarmentCutClassificationController::class, 'update']
+            )
+                ->middleware('permission:processes.classify')
+                ->name('garment-cuts.classification.update');
+
+            // rutas para los movimientos de producción
+            Route::get('/production-movements', [
+                ProductionMovementController::class,
+                'index',
+            ])
+                ->middleware('permission:processes.view')
+                ->name('production-movements.index');
+
+            Route::post('/production-movements', [
+                ProductionMovementController::class,
+                'store',
+            ])
+                ->middleware('permission:processes.classify')
+                ->name('production-movements.store');
+
+            Route::get('/production-movements/{production_movement}', [
+                ProductionMovementController::class,
+                'show',
+            ])
+                ->middleware('permission:processes.view')
+                ->name('production-movements.show');
+
+            Route::post('/production-movements/{production_movement}/receive', [
+                ProductionMovementController::class,
+                'receive',
+            ])
+                ->middleware('permission:processes.update-status')
+                ->name('production-movements.receive');
+                    });
+
+            // Rutas para ProductionOperationLog
+            Route::get(
+                '/production-movements/{production_movement}/operation-logs',
+                [ProductionOperationLogController::class, 'index']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:processes.view',
+            ])->name('production-movements.operation-logs.index');
+
+            Route::post(
+                '/production-movements/{production_movement}/operation-logs',
+                [ProductionOperationLogController::class, 'store']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:processes.assign',
+            ])->name('production-movements.operation-logs.store');
+
+            Route::match(
+                ['put', 'patch'],
+                '/production-operation-logs/{production_operation_log}',
+                [ProductionOperationLogController::class, 'update']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:processes.update-status',
+            ])->name('production-operation-logs.update');
+
     });

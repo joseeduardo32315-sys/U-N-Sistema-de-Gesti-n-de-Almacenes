@@ -60,6 +60,7 @@ class RolePermissionSeeder extends Seeder
             'processes.view',
             'processes.assign',
             'processes.update-status',
+            'processes.classify',
 
             // Entregas y recepciones
             'deliveries.create',
@@ -103,7 +104,7 @@ class RolePermissionSeeder extends Seeder
                 'processes.view',
                 'processes.assign',
                 'processes.update-status',
-
+                'processes.classify',
                 'deliveries.create',
                 'receptions.create',
 
@@ -125,6 +126,7 @@ class RolePermissionSeeder extends Seeder
                 'cuts.update',
 
                 'processes.view',
+                'processes.assign',
                 'processes.update-status',
 
                 'incidents.view',
@@ -138,6 +140,8 @@ class RolePermissionSeeder extends Seeder
                 'cuts.view',
 
                 'processes.view',
+                'processes.assign',
+                'processes.classify',
                 'processes.update-status',
 
                 'incidents.view',
@@ -151,6 +155,7 @@ class RolePermissionSeeder extends Seeder
                 'cuts.view',
 
                 'processes.view',
+                'processes.assign',
                 'processes.update-status',
 
                 'deliveries.create',
@@ -167,6 +172,7 @@ class RolePermissionSeeder extends Seeder
                 'cuts.view',
 
                 'processes.view',
+                'processes.assign',
                 'processes.update-status',
 
                 'deliveries.create',
@@ -184,6 +190,7 @@ class RolePermissionSeeder extends Seeder
                 'cuts.finish',
 
                 'processes.view',
+                'processes.assign',
                 'processes.update-status',
 
                 'deliveries.create',

@@ -79,6 +79,28 @@ class GarmentCutResource extends JsonResource
                     ->all();
             }),
 
+            'complement' => $this->when(
+                $this->relationLoaded('complement'),
+                function () {
+                    return $this->complement
+                        ? new GarmentCutComplementResource(
+                            $this->complement
+                        )
+                        : null;
+                }
+            ),
+
+            'special_process_pieces' => $this->when(
+                $this->relationLoaded('specialProcessPieces'),
+                function () {
+                    return SpecialProcessPieceResource::collection(
+                        $this->specialProcessPieces
+                            ->sortBy('id')
+                            ->values()
+                    );
+                }
+            ),
+
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

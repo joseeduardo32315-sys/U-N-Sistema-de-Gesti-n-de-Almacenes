@@ -37,4 +37,20 @@ class User extends Authenticatable
     {
         return $this->hasMany(ProductionOrder::class, 'created_by');
     }
+
+    public function createdProductionMovements(): HasMany
+    {
+        return $this->hasMany(
+            ProductionMovement::class,
+            'created_by'
+        );
+    }
+
+    public function receivedProductionMovements(): HasMany
+    {
+        return $this->hasMany(
+            ProductionMovement::class,
+            'received_by'
+        );
+    }
 }

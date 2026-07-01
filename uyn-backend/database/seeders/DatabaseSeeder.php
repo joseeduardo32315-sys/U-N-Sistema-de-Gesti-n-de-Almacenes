@@ -12,6 +12,8 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             AreaSeeder::class,
             SizeSeeder::class,
+            WorkflowProcessSeeder::class,
+            PieceTypeSeeder::class,
             AdminUserSeeder::class,
         ]);
     }

@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('processes', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+
+            $table->string('name', 100)->unique();
+
+            /**
+             * Define el orden general del flujo productivo.
+             */
+            $table->unsignedSmallInteger('flow_order')->unique();
         });
     }
 
