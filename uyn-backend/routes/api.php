@@ -9,6 +9,9 @@ use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\AreaController;
 use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\GarmentModelController;
+use App\Http\Controllers\Api\ProductionOrderController;
+use App\Http\Controllers\Api\SizeController;
+use App\Http\Controllers\Api\GarmentCutController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -141,5 +144,61 @@ Route::prefix('v1')
             ])
                 ->middleware('permission:garment-models.update')
                 ->name('garment-models.update');
+
+            // Rutas para las ordenes de producción y las tallas
+            Route::get('/sizes', [SizeController::class, 'index'])
+                ->middleware('permission:cuts.view')
+                ->name('sizes.index');
+
+            Route::get('/production-orders', [
+                ProductionOrderController::class,
+                'index',
+            ])
+                ->middleware('permission:cuts.view')
+                ->name('production-orders.index');
+
+            Route::post('/production-orders', [
+                ProductionOrderController::class,
+                'store',
+            ])
+                ->middleware('permission:cuts.create')
+                ->name('production-orders.store');
+
+            Route::get('/production-orders/{production_order}', [
+                ProductionOrderController::class,
+                'show',
+            ])
+                ->middleware('permission:cuts.view')
+                ->name('production-orders.show');
+
+            Route::match(['put', 'patch'], '/production-orders/{production_order}', [
+                ProductionOrderController::class,
+                'update',
+            ])
+                ->middleware('permission:cuts.update')
+                ->name('production-orders.update');
+
+            // Rutas para GarmentCut 
+            Route::get('/garment-cuts', [GarmentCutController::class, 'index'])
+                ->middleware('permission:cuts.view')
+                ->name('garment-cuts.index');
+
+            Route::post('/garment-cuts', [GarmentCutController::class, 'store'])
+                ->middleware('permission:cuts.create')
+                ->name('garment-cuts.store');
+
+            Route::get('/garment-cuts/{garment_cut}', [
+                GarmentCutController::class,
+                'show',
+            ])
+                ->middleware('permission:cuts.view')
+                ->name('garment-cuts.show');
+
+            Route::match(['put', 'patch'], '/garment-cuts/{garment_cut}', [
+                GarmentCutController::class,
+                'update',
+            ])
+                ->middleware('permission:cuts.update')
+                ->name('garment-cuts.update');
         });
     });

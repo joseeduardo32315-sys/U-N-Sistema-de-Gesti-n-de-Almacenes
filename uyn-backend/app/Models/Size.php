@@ -6,21 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class GarmentModel extends Model
+class Size extends Model
 {
+    /** @use HasFactory<\Database\Factories\SizeFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'code',
         'name',
         'description',
-        'size_range',
-        'image_path',
         'status'
     ];
 
-    public function garmentCuts(): HasMany
+    public function garmentCutSizes(): HasMany
     {
-        return $this->hasMany(GarmentCut::class);
+        return $this->hasMany(GarmentCutSize::class);
     }
 }

@@ -19,4 +19,9 @@ class Area extends Model
     {
         return $this->hasMany(Employee::class);
     }
+
+    public function currentGarmentCuts(): HasMany
+    {
+        return $this->hasMany(GarmentCut::class, 'current_area_id');
+    }
 }
