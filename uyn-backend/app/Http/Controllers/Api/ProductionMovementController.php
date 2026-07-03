@@ -44,8 +44,15 @@ class ProductionMovementController extends Controller
 
                 'createdBy',
                 'receivedBy',
+
+                'returnIncident',
             ])
             ->withCount('operationLogs')
+            ->withSum([
+                'productionIncidents as resolved_loss_quantity' => fn ($query) => $query
+                ->where('incident_type', 'loss')
+                ->where('status', 'resolved')
+            ], 'quantity_affected')
             ->when(
                 $filters['garment_cut_id'] ?? null,
                 fn ($query, $cutId) => $query->where(
@@ -156,8 +163,16 @@ class ProductionMovementController extends Controller
 
                 'operationLogs.employee',
                 'operationLogs.operationProcess',
+
+                'returnIncident',
             ])
             ->loadCount('operationLogs');
+
+            $productionMovement->loadSum([
+                'productionIncidents as resolved_loss_quantity' => fn ($query) => $query
+                    ->where('incident_type', 'loss')
+                    ->where('status', 'resolved'),
+            ], 'quantity_affected');
 
         return new ProductionMovementResource($productionMovement);
     }

@@ -9,6 +9,16 @@ class ProductionMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+
+        $resolvedLossQuantity = (int) (
+            $this->resolved_loss_quantity ?? 0
+        );
+
+        $effectiveQuantity = max(
+            0,
+            (int) $this->quantity - $resolvedLossQuantity
+        );
+
         return [
             'id' => $this->id,
 
@@ -21,7 +31,27 @@ class ProductionMovementResource extends JsonResource
                 default => 'No definido',
             },
 
+            'return_incident_id' => $this->return_incident_id,
+
+            'is_return_for_rework' => $this->return_incident_id !== null,
+
+            'return_incident' => $this->whenLoaded(
+                'returnIncident',
+                function () {
+                    return $this->returnIncident
+                        ? [
+                            'id' => $this->returnIncident->id,
+                            'incident_type' => $this->returnIncident->incident_type,
+                            'status' => $this->returnIncident->status,
+                        ]
+                        : null;
+                }
+            ),
+
             'quantity' => $this->quantity,
+
+            'resolved_loss_quantity' => $resolvedLossQuantity,
+            'effective_quantity' => $effectiveQuantity,
 
             'status' => $this->status,
 

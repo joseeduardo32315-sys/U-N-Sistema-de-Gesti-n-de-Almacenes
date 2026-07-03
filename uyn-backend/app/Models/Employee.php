@@ -31,4 +31,12 @@ class Employee extends Model
             ProductionOperationLog::class
         );
     }
+
+    public function responsibleProductionIncidents(): HasMany
+    {
+        return $this->hasMany(
+            ProductionIncident::class,
+            'responsible_employee_id'
+        );
+    }
 }

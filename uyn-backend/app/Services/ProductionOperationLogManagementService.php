@@ -14,6 +14,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\ProductionIncident;
 
 class ProductionOperationLogManagementService
 {
@@ -177,13 +178,17 @@ class ProductionOperationLogManagementService
                 ->whereKeyNot($operationLog->id)
                 ->sum('quantity_processed');
 
+            $effectiveMovementQuantity = $this->effectiveMovementQuantity(
+                $movement
+            );
+
             if (
                 $processedByOtherEmployees + $newQuantity
-                > (int) $movement->quantity
+                > $effectiveMovementQuantity
             ) {
                 throw ValidationException::withMessages([
                     'quantity_processed' =>
-                        'La cantidad procesada supera la cantidad enviada en el movimiento.',
+                        'La cantidad procesada supera la cantidad efectiva disponible en el movimiento.',
                 ]);
             }
 
@@ -356,9 +361,13 @@ class ProductionOperationLogManagementService
                     $log->status === 'completed'
             );
 
+        $effectiveMovementQuantity = $this->effectiveMovementQuantity(
+            $movement
+        );
+
         if (
             $allLogsCompleted
-            && $totalProcessed === (int) $movement->quantity
+            && $totalProcessed === $effectiveMovementQuantity
         ) {
             $movement->update([
                 'status' => 'completed',
@@ -467,5 +476,20 @@ class ProductionOperationLogManagementService
                     ?->toArea
                     ?->name,
         ];
+    }
+
+    private function effectiveMovementQuantity(
+        ProductionMovement $movement
+    ): int {
+        $resolvedLossQuantity = (int) ProductionIncident::query()
+            ->where('production_movement_id', $movement->id)
+            ->where('incident_type', 'loss')
+            ->where('status', 'resolved')
+            ->sum('quantity_affected');
+
+        return max(
+            0,
+            (int) $movement->quantity - $resolvedLossQuantity
+        );
     }
 }

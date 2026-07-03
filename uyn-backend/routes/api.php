@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\ProcessController;
 use App\Http\Controllers\Api\GarmentCutClassificationController;
 use App\Http\Controllers\Api\ProductionMovementController;
 use App\Http\Controllers\Api\ProductionOperationLogController;
+use App\Http\Controllers\Api\ProductionIncidentController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -289,5 +290,61 @@ Route::prefix('v1')
                 'active.user',
                 'permission:processes.update-status',
             ])->name('production-operation-logs.update');
+
+            // Rutas para incidencias de producción
+            Route::get('/production-incidents', [
+                ProductionIncidentController::class,
+                'index',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:incidents.view',
+            ])->name('production-incidents.index');
+
+            Route::post('/production-incidents', [
+                ProductionIncidentController::class,
+                'store',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:incidents.create',
+            ])->name('production-incidents.store');
+
+            Route::get('/production-incidents/{production_incident}', [
+                ProductionIncidentController::class,
+                'show',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:incidents.view',
+            ])->name('production-incidents.show');
+
+            Route::match(
+                ['put', 'patch'],
+                '/production-incidents/{production_incident}',
+                [ProductionIncidentController::class, 'update']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:incidents.update',
+            ])->name('production-incidents.update');
+
+            Route::post(
+                '/production-incidents/{production_incident}/resolve',
+                [ProductionIncidentController::class, 'resolve']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:incidents.close',
+            ])->name('production-incidents.resolve');
+
+            Route::post(
+                '/production-incidents/{production_incident}/return-for-rework',
+                [ProductionIncidentController::class, 'returnForRework']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:incidents.update',
+            ])->name('production-incidents.return-for-rework');
 
     });

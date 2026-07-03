@@ -112,6 +112,11 @@ class GarmentCutController extends Controller
             'garmentModel',
             'currentArea',
             'cutSizes.size',
+            'complement.currentArea',
+
+            'specialProcessPieces.pieceType',
+            'specialProcessPieces.process',
+            'specialProcessPieces.currentArea',
         ]);
 
         return new GarmentCutResource($garmentCut);

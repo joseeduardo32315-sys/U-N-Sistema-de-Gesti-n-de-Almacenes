@@ -18,6 +18,8 @@ class ProductionMovementFactory extends Factory
         return [
             'garment_cut_id' => GarmentCut::factory(),
 
+            'return_incident_id' => null,
+
             'target_type' => 'cut',
 
             'special_process_piece_id' => null,

@@ -53,4 +53,12 @@ class User extends Authenticatable
             'received_by'
         );
     }
+
+    public function resolvedProductionIncidents(): HasMany
+    {
+        return $this->hasMany(
+            ProductionIncident::class,
+            'resolved_by'
+        );
+    }
 }

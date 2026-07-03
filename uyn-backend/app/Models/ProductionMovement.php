@@ -27,6 +27,7 @@ class ProductionMovement extends Model
         'notes',
         'created_by',
         'received_by',
+        'return_incident_id',
     ];
 
     protected function casts(): array
@@ -102,6 +103,21 @@ class ProductionMovement extends Model
     {
         return $this->hasMany(
             ProductionOperationLog::class
+        );
+    }
+
+    public function productionIncidents(): HasMany
+    {
+        return $this->hasMany(
+            ProductionIncident::class
+        );
+    }
+
+    public function returnIncident(): BelongsTo
+    {
+        return $this->belongsTo(
+            ProductionIncident::class,
+            'return_incident_id'
         );
     }
 }

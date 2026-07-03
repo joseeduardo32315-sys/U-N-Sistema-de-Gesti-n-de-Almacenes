@@ -131,6 +131,7 @@ class RolePermissionSeeder extends Seeder
 
                 'incidents.view',
                 'incidents.create',
+                'incidents.update',
             ],
 
             'Encargado de diseño' => [
@@ -146,6 +147,7 @@ class RolePermissionSeeder extends Seeder
 
                 'incidents.view',
                 'incidents.create',
+                'incidents.update',
             ],
 
             'Encargado de bordado' => [
@@ -163,6 +165,7 @@ class RolePermissionSeeder extends Seeder
 
                 'incidents.view',
                 'incidents.create',
+                'incidents.update',
             ],
 
             'Encargado de maquila' => [
@@ -180,6 +183,7 @@ class RolePermissionSeeder extends Seeder
 
                 'incidents.view',
                 'incidents.create',
+                'incidents.update',
             ],
 
             'Encargado de preparación/terminado' => [

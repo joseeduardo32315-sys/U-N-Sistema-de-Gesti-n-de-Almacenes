@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use App\Models\ProductionIncident;
 
 class ProductionMovementManagementService
 {
@@ -37,6 +38,12 @@ class ProductionMovementManagementService
                 data: $data
             );
 
+            $this->ensureTargetHasNoOpenIncidents(
+                garmentCut: $garmentCut,
+                target: $target,
+                targetType: $data['target_type']
+            );
+
             $destination = $this->resolveDestination(
                 processId: (int) $data['process_id'],
                 operationProcessId: (int) $data['operation_process_id']
@@ -53,8 +60,10 @@ class ProductionMovementManagementService
                 targetType: $data['target_type']
             );
 
-            $this->ensureQuantityMatchesCut(
+            $this->ensureQuantityMatchesTarget(
                 garmentCut: $garmentCut,
+                target: $target,
+                targetType: $data['target_type'],
                 quantity: (int) $data['quantity']
             );
 
@@ -444,16 +453,64 @@ class ProductionMovementManagementService
         }
     }
 
-    private function ensureQuantityMatchesCut(
+    private function ensureQuantityMatchesTarget(
         GarmentCut $garmentCut,
+        Model $target,
+        string $targetType,
         int $quantity
     ): void {
-        if ($quantity !== (int) $garmentCut->total_pieces) {
+        $resolvedLossQuantity = $this->resolvedLossQuantityForTarget(
+            garmentCut: $garmentCut,
+            target: $target,
+            targetType: $targetType
+        );
+
+        $availableQuantity = max(
+            0,
+            (int) $garmentCut->total_pieces - $resolvedLossQuantity
+        );
+
+        if ($availableQuantity === 0) {
             throw ValidationException::withMessages([
                 'quantity' =>
-                    "En esta fase el traslado debe incluir las {$garmentCut->total_pieces} piezas del corte. La distribución entre trabajadores se registrará mediante operaciones.",
+                    'No existen piezas disponibles para trasladar porque todas fueron registradas como pérdida permanente.',
             ]);
         }
+
+        if ($quantity !== $availableQuantity) {
+            throw ValidationException::withMessages([
+                'quantity' =>
+                    "El traslado debe incluir las {$availableQuantity} piezas disponibles para este objetivo.",
+            ]);
+        }
+    }
+
+    private function resolvedLossQuantityForTarget(
+        GarmentCut $garmentCut,
+        Model $target,
+        string $targetType
+    ): int {
+        $movements = ProductionMovement::query()
+            ->select('id')
+            ->where('garment_cut_id', $garmentCut->id)
+            ->where('target_type', $targetType);
+
+        if ($targetType === 'complement') {
+            $movements->where('complement_id', $target->id);
+        }
+
+        if ($targetType === 'special_piece') {
+            $movements->where(
+                'special_process_piece_id',
+                $target->id
+            );
+        }
+
+        return (int) ProductionIncident::query()
+            ->whereIn('production_movement_id', $movements)
+            ->where('incident_type', 'loss')
+            ->where('status', 'resolved')
+            ->sum('quantity_affected');
     }
 
     private function ensureTransitionIsAllowed(
@@ -542,6 +599,8 @@ class ProductionMovementManagementService
 
                 'createdBy',
                 'receivedBy',
+
+                'returnIncident',
             ])
             ->loadCount('operationLogs');
     }
@@ -588,5 +647,39 @@ class ProductionMovementManagementService
             'created_by' => $movement->createdBy?->username,
             'received_by' => $movement->receivedBy?->username,
         ];
+    }
+
+    private function ensureTargetHasNoOpenIncidents(
+        GarmentCut $garmentCut,
+        Model $target,
+        string $targetType
+    ): void {
+        $movementIds = ProductionMovement::query()
+            ->select('id')
+            ->where('garment_cut_id', $garmentCut->id)
+            ->where('target_type', $targetType);
+
+        if ($targetType === 'complement') {
+            $movementIds->where('complement_id', $target->id);
+        }
+
+        if ($targetType === 'special_piece') {
+            $movementIds->where(
+                'special_process_piece_id',
+                $target->id
+            );
+        }
+
+        $hasOpenIncidents = ProductionIncident::query()
+            ->whereIn('production_movement_id', $movementIds)
+            ->where('status', 'open')
+            ->exists();
+
+        if ($hasOpenIncidents) {
+            throw ValidationException::withMessages([
+                'target_type' =>
+                    'No puedes registrar un traslado normal mientras existan incidencias abiertas para este objetivo.',
+            ]);
+        }
     }
 }

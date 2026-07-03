@@ -70,4 +70,11 @@ class GarmentCut extends Model
             ProductionMovement::class
         );
     }
+
+    public function productionIncidents(): HasMany
+    {
+        return $this->hasMany(
+            ProductionIncident::class
+        );
+    }
 }
