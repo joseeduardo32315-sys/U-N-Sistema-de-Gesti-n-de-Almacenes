@@ -19,7 +19,8 @@ use App\Models\ProductionIncident;
 class ProductionOperationLogManagementService
 {
     public function __construct(
-        private readonly OperationLogService $operationLogService
+        private readonly OperationLogService $operationLogService,
+        private readonly PayoutCalculationService $payoutCalculationService
     ) {
     }
 
@@ -120,6 +121,8 @@ class ProductionOperationLogManagementService
         ) {
             $operationLog = ProductionOperationLog::query()
                 ->with([
+                    'employee',
+                    'operationProcess.process',
                     'productionMovement.toArea',
                     'productionMovement.process',
                 ])
@@ -204,6 +207,20 @@ class ProductionOperationLogManagementService
                 ]);
             }
 
+            $effectiveStitchesCount = array_key_exists(
+                'stitches_count',
+                $data
+            )
+                ? $data['stitches_count']
+                : $operationLog->stitches_count;
+
+            $effectiveApplicationsCount = array_key_exists(
+                'applications_count',
+                $data
+            )
+                ? $data['applications_count']
+                : $operationLog->applications_count;
+
             $attributes = [];
 
             if (array_key_exists('quantity_processed', $data)) {
@@ -232,11 +249,27 @@ class ProductionOperationLogManagementService
             }
 
             if ($shouldComplete) {
-                $attributes['status'] = 'completed';
-                $attributes['start_time'] =
-                    $operationLog->start_time ?? now();
+                $completedAt = now();
 
-                $attributes['end_time'] = now();
+                $payout = $this->payoutCalculationService->calculate(
+                    operationLog: $operationLog,
+                    quantityProcessed: $newQuantity,
+                    stitchesCount: $effectiveStitchesCount,
+                    applicationsCount: $effectiveApplicationsCount,
+                    completedAt: $completedAt
+                );
+
+                $attributes['status'] = 'completed';
+
+                $attributes['start_time'] =
+                    $operationLog->start_time ?? $completedAt;
+
+                $attributes['end_time'] = $completedAt;
+
+                $attributes['payout_amount'] = $payout['payout_amount'];
+
+                $attributes['payout_snapshot'] =
+                    $payout['payout_snapshot'];
             }
 
             $operationLog->update($attributes);

@@ -46,6 +46,7 @@ class WorkflowProcessSeeder extends Seeder
                     [
                         'name' => 'Bordado',
                         'flow_order' => 1,
+                        'payroll_calculation_type' => 'embroidery_formula',
                     ],
                 ],
             ],
@@ -99,6 +100,7 @@ class WorkflowProcessSeeder extends Seeder
                     ],
                     [
                         'flow_order' => $operationData['flow_order'],
+                        'payroll_calculation_type' => $operationData['payroll_calculation_type'] ?? 'per_piece',
                     ]
                 );
             }

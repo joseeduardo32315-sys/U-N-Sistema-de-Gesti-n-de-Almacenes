@@ -48,6 +48,7 @@ class StoreProductionOperationLogRequest extends FormRequest
             'start_time' => ['prohibited'],
             'end_time' => ['prohibited'],
             'payout_amount' => ['prohibited'],
+            'payout_snapshot' => ['prohibited'],
         ];
     }
 

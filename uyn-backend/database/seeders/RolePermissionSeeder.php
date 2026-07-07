@@ -75,6 +75,14 @@ class RolePermissionSeeder extends Seeder
             // Reportes
             'reports.view',
             'reports.export',
+
+            // Compensación y apoyo a destajo
+            'payroll.view',
+            'payroll.manage',
+            'payroll.generate',
+            'payroll.close',
+
+
         ];
 
         foreach ($permissions as $permission) {
@@ -115,6 +123,9 @@ class RolePermissionSeeder extends Seeder
 
                 'reports.view',
                 'reports.export',
+
+                'payroll.view',
+                'payroll.generate'
             ],
 
             'Encargado de corte' => [

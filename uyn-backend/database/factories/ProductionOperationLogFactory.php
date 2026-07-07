@@ -36,6 +36,7 @@ class ProductionOperationLogFactory extends Factory
                 ->sentence(),
 
             'payout_amount' => null,
+            'payout_snapshot' => null,
         ];
     }
 }

@@ -22,6 +22,7 @@ class ProductionOperationLog extends Model
         'status',
         'notes',
         'payout_amount',
+        'payout_snapshot',
     ];
 
     protected function casts(): array
@@ -33,6 +34,7 @@ class ProductionOperationLog extends Model
             'applications_count' => 'integer',
             'quantity_processed' => 'integer',
             'payout_amount' => 'decimal:2',
+            'payout_snapshot' => 'array',
         ];
     }
 

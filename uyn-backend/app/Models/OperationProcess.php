@@ -17,6 +17,7 @@ class OperationProcess extends Model
         'process_id',
         'name',
         'flow_order',
+        'payroll_calculation_type',
     ];
 
     protected function casts(): array
@@ -43,5 +44,15 @@ class OperationProcess extends Model
         return $this->hasMany(
             ProductionOperationLog::class
         );
+    }
+
+    public function pieceworkRates(): HasMany
+    {
+        return $this->hasMany(PieceworkRate::class);
+    }
+
+    public function embroideryPaymentSettings(): HasMany
+    {
+        return $this->hasMany(EmbroideryPaymentSetting::class);
     }
 }

@@ -18,6 +18,9 @@ use App\Http\Controllers\Api\GarmentCutClassificationController;
 use App\Http\Controllers\Api\ProductionMovementController;
 use App\Http\Controllers\Api\ProductionOperationLogController;
 use App\Http\Controllers\Api\ProductionIncidentController;
+use App\Http\Controllers\Api\EmployeeCompensationController;
+use App\Http\Controllers\Api\PieceworkRateController;
+use App\Http\Controllers\Api\EmbroideryPaymentSettingController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -244,7 +247,7 @@ Route::prefix('v1')
                 ProductionMovementController::class,
                 'store',
             ])
-                ->middleware('permission:processes.classify')
+                ->middleware('permission:processes.assign')
                 ->name('production-movements.store');
 
             Route::get('/production-movements/{production_movement}', [
@@ -260,7 +263,6 @@ Route::prefix('v1')
             ])
                 ->middleware('permission:processes.update-status')
                 ->name('production-movements.receive');
-                    });
 
             // Rutas para ProductionOperationLog
             Route::get(
@@ -347,4 +349,86 @@ Route::prefix('v1')
                 'permission:incidents.update',
             ])->name('production-incidents.return-for-rework');
 
+            // Rutas para EmployeeCompensation
+            Route::get('/employee-compensations', [
+                EmployeeCompensationController::class,
+                'index',
+            ])->middleware('permission:payroll.view');
+
+            Route::post('/employee-compensations', [
+                EmployeeCompensationController::class,
+                'store',
+            ])->middleware('permission:payroll.manage');
+
+            Route::get('/employee-compensations/{employee_compensation}', [
+                EmployeeCompensationController::class,
+                'show',
+            ])->middleware('permission:payroll.view');
+
+            Route::match(
+                ['put', 'patch'],
+                '/employee-compensations/{employee_compensation}',
+                [EmployeeCompensationController::class, 'update']
+            )->middleware('permission:payroll.manage');
+
+            Route::get('/piecework-rates', [
+                PieceworkRateController::class,
+                'index',
+            ])->middleware('permission:payroll.view');
+
+            Route::post('/piecework-rates', [
+                PieceworkRateController::class,
+                'store',
+            ])->middleware('permission:payroll.manage');
+
+            Route::get('/piecework-rates/{piecework_rate}', [
+                PieceworkRateController::class,
+                'show',
+            ])->middleware('permission:payroll.view');
+
+            Route::match(
+                ['put', 'patch'],
+                '/piecework-rates/{piecework_rate}',
+                [PieceworkRateController::class, 'update']
+            )->middleware('permission:payroll.manage');
+
+            // Rutas para EmbroideryPaymentSetting
+            Route::get('/embroidery-payment-settings', [
+                EmbroideryPaymentSettingController::class,
+                'index',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.view',
+            ])->name('embroidery-payment-settings.index');
+
+            Route::post('/embroidery-payment-settings', [
+                EmbroideryPaymentSettingController::class,
+                'store',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.manage',
+            ])->name('embroidery-payment-settings.store');
+
+            Route::get(
+                '/embroidery-payment-settings/{embroidery_payment_setting}',
+                [EmbroideryPaymentSettingController::class, 'show']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.view',
+            ])->name('embroidery-payment-settings.show');
+
+            Route::match(
+                ['put', 'patch'],
+                '/embroidery-payment-settings/{embroidery_payment_setting}',
+                [EmbroideryPaymentSettingController::class, 'update']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.manage',
+            ])->name('embroidery-payment-settings.update');
     });
+
+});

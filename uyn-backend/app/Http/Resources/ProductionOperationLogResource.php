@@ -9,6 +9,8 @@ class ProductionOperationLogResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $canViewPayroll = $request->user()?->can('payroll.view') ?? false;
+
         return [
             'id' => $this->id,
 
@@ -33,7 +35,20 @@ class ProductionOperationLogResource extends JsonResource
 
             'notes' => $this->notes,
 
-            'payout_amount' => $this->payout_amount,
+            'payout_amount' => $this->when(
+                $canViewPayroll,
+                $this->payout_amount
+            ),
+
+            'payout_status' => $this->when(
+                $canViewPayroll,
+                data_get($this->payout_snapshot, 'payment_status')
+            ),
+
+            'payout_snapshot' => $this->when(
+                $canViewPayroll,
+                $this->payout_snapshot
+            ),
 
             'employee' => $this->whenLoaded('employee', function () {
                 return [

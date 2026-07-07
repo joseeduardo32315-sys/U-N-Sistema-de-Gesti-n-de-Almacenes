@@ -39,4 +39,14 @@ class Employee extends Model
             'responsible_employee_id'
         );
     }
+
+    public function compensations(): HasMany
+    {
+        return $this->hasMany(EmployeeCompensation::class);
+    }
+
+    public function pieceworkRates(): HasMany
+    {
+        return $this->hasMany(PieceworkRate::class);
+    }
 }
