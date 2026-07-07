@@ -15,6 +15,9 @@ use App\Models\ProductionOrder;
 use App\Models\Size;
 use App\Models\SpecialProcessPiece;
 use App\Models\User;
+use App\Models\EmployeeCompensation;
+use App\Models\EmbroideryPaymentSetting;
+use Carbon\Carbon;
 use Database\Seeders\AreaSeeder;
 use Database\Seeders\PieceTypeSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -32,6 +35,8 @@ class ProductionOperationLogApiTest extends TestCase
     {
         parent::setUp();
 
+        Carbon::setTestNow('2026-07-07 10:00:00');
+
         $this->seed([
             RolePermissionSeeder::class,
             AreaSeeder::class,
@@ -39,6 +44,13 @@ class ProductionOperationLogApiTest extends TestCase
             WorkflowProcessSeeder::class,
             PieceTypeSeeder::class,
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
     }
 
     private function authenticateAdministrator(): User
@@ -121,6 +133,59 @@ class ProductionOperationLogApiTest extends TestCase
             'worker_type' => 'internal',
             'status' => 'active',
         ], $attributes));
+    }
+
+    private function createPieceworkCompensation(
+        Employee $employee,
+        User $actor
+    ): EmployeeCompensation {
+        return EmployeeCompensation::query()->create([
+            'employee_id' => $employee->id,
+            'payment_type' => 'piecework',
+            'payment_frequency' => null,
+            'fixed_amount' => null,
+            'effective_from' => '2026-07-01',
+            'effective_to' => null,
+            'status' => 'active',
+            'notes' => 'Compensación por destajo para prueba.',
+            'created_by' => $actor->id,
+        ]);
+    }
+
+    private function createFixedCompensation(
+        Employee $employee,
+        User $actor
+    ): EmployeeCompensation {
+        return EmployeeCompensation::query()->create([
+            'employee_id' => $employee->id,
+            'payment_type' => 'fixed',
+            'payment_frequency' => 'weekly',
+            'fixed_amount' => 2500.00,
+            'effective_from' => '2026-07-01',
+            'effective_to' => null,
+            'status' => 'active',
+            'notes' => 'Compensación fija para prueba.',
+            'created_by' => $actor->id,
+        ]);
+    }
+
+    private function createEmbroideryPaymentSetting(
+        OperationProcess $operation,
+        User $actor
+    ): EmbroideryPaymentSetting {
+        return EmbroideryPaymentSetting::query()->create([
+            'operation_process_id' => $operation->id,
+            'stitch_price' => '0.00010000',
+            'application_price' => '1.0000',
+            'payment_percentage' => '0.300000',
+            'minimum_payment_per_piece' => '0.7500',
+            'default_payment_per_piece' => '0.7500',
+            'effective_from' => '2026-07-01',
+            'effective_to' => null,
+            'status' => 'active',
+            'notes' => 'Configuración de Bordado para prueba.',
+            'created_by' => $actor->id,
+        ]);
     }
 
     private function createReceivedBordadoMovement(
@@ -764,5 +829,259 @@ class ProductionOperationLogApiTest extends TestCase
                 'data.operation_logs.0.operation_process.name',
                 'Bordado'
             );
+    }
+
+    public function test_completion_calculates_and_persists_embroidery_payout_above_minimum(): void
+    {
+        $admin = $this->authenticateAdministrator();
+
+        [, , $movement] = $this->createReceivedBordadoMovement($admin);
+
+        $employee = $this->createEmployee('Bordado');
+
+        $operation = $this->getOperation('Bordado');
+
+        $this->createPieceworkCompensation($employee, $admin);
+
+        $this->createEmbroideryPaymentSetting($operation, $admin);
+
+        $operationLog = $this->assignEmployee($movement, $employee);
+
+        $response = $this->patchJson(
+            $this->operationLogUrl($operationLog),
+            [
+                'complete' => true,
+                'quantity_processed' => 100,
+                'stitches_count' => 8000,
+                'applications_count' => 2,
+                'notes' => 'Bordado terminado con pago calculado.',
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.payout_amount', '84.00')
+            ->assertJsonPath('data.payout_status', 'calculated')
+            ->assertJsonPath(
+                'data.payout_snapshot.calculation_type',
+                'embroidery_formula'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.formula_payment_per_piece',
+                '0.8400'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.minimum_applied',
+                false
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.final_payment_per_piece',
+                '0.8400'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.payout_amount',
+                '84.00'
+            );
+
+        $savedLog = $operationLog->fresh();
+
+        $this->assertSame('84.00', $savedLog->payout_amount);
+
+        $this->assertSame(
+            'calculated',
+            data_get($savedLog->payout_snapshot, 'payment_status')
+        );
+
+        $this->assertSame(
+            'embroidery_formula',
+            data_get($savedLog->payout_snapshot, 'calculation_type')
+        );
+
+        $this->assertSame(
+            '0.8400',
+            data_get(
+                $savedLog->payout_snapshot,
+                'final_payment_per_piece'
+            )
+        );
+
+        $this->assertSame(
+            '84.00',
+            data_get($savedLog->payout_snapshot, 'payout_amount')
+        );
+    }
+
+    public function test_completion_uses_default_payment_when_embroidery_formula_is_below_minimum(): void
+    {
+        $admin = $this->authenticateAdministrator();
+
+        [, , $movement] = $this->createReceivedBordadoMovement($admin);
+
+        $employee = $this->createEmployee('Bordado');
+
+        $operation = $this->getOperation('Bordado');
+
+        $this->createPieceworkCompensation($employee, $admin);
+
+        $this->createEmbroideryPaymentSetting($operation, $admin);
+
+        $operationLog = $this->assignEmployee($movement, $employee);
+
+        $response = $this->patchJson(
+            $this->operationLogUrl($operationLog),
+            [
+                'complete' => true,
+                'quantity_processed' => 100,
+                'stitches_count' => 1000,
+                'applications_count' => 0,
+                'notes' => 'Bordado terminado con pago predeterminado.',
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.payout_amount', '75.00')
+            ->assertJsonPath('data.payout_status', 'calculated')
+            ->assertJsonPath(
+                'data.payout_snapshot.formula_payment_per_piece',
+                '0.0300'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.minimum_applied',
+                true
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.final_payment_per_piece',
+                '0.7500'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.payout_amount',
+                '75.00'
+            );
+
+        $savedLog = $operationLog->fresh();
+
+        $this->assertSame('75.00', $savedLog->payout_amount);
+
+        $this->assertTrue(
+            data_get($savedLog->payout_snapshot, 'minimum_applied')
+        );
+
+        $this->assertSame(
+            '0.7500',
+            data_get(
+                $savedLog->payout_snapshot,
+                'final_payment_per_piece'
+            )
+        );
+    }
+
+    public function test_completion_with_fixed_compensation_does_not_generate_piecework_payout(): void
+    {
+        $admin = $this->authenticateAdministrator();
+
+        [, , $movement] = $this->createReceivedBordadoMovement($admin);
+
+        $employee = $this->createEmployee('Bordado');
+
+        $this->createFixedCompensation($employee, $admin);
+
+        $operationLog = $this->assignEmployee($movement, $employee);
+
+        $response = $this->patchJson(
+            $this->operationLogUrl($operationLog),
+            [
+                'complete' => true,
+                'quantity_processed' => 100,
+                'stitches_count' => 8000,
+                'applications_count' => 2,
+                'notes' => 'Bordado concluido por trabajador con pago fijo.',
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.payout_amount', null)
+            ->assertJsonPath('data.payout_status', 'not_applicable')
+            ->assertJsonPath(
+                'data.payout_snapshot.payment_type',
+                'fixed'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.calculation_type',
+                'fixed_salary'
+            );
+
+        $savedLog = $operationLog->fresh();
+
+        $this->assertNull($savedLog->payout_amount);
+
+        $this->assertSame(
+            'not_applicable',
+            data_get($savedLog->payout_snapshot, 'payment_status')
+        );
+
+        $this->assertSame(
+            'fixed_salary',
+            data_get($savedLog->payout_snapshot, 'calculation_type')
+        );
+    }
+
+    public function test_completion_without_embroidery_payment_setting_remains_pending_without_blocking_production(): void
+    {
+        $admin = $this->authenticateAdministrator();
+
+        [, , $movement] = $this->createReceivedBordadoMovement($admin);
+
+        $employee = $this->createEmployee('Bordado');
+
+        $this->createPieceworkCompensation($employee, $admin);
+
+        $operationLog = $this->assignEmployee($movement, $employee);
+
+        $response = $this->patchJson(
+            $this->operationLogUrl($operationLog),
+            [
+                'complete' => true,
+                'quantity_processed' => 100,
+                'stitches_count' => 8000,
+                'applications_count' => 2,
+                'notes' => 'Bordado finalizado sin configuración de pago.',
+            ]
+        );
+
+        $response
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.payout_amount', null)
+            ->assertJsonPath(
+                'data.payout_status',
+                'pending_configuration'
+            )
+            ->assertJsonPath(
+                'data.payout_snapshot.reason',
+                'No existe una configuración activa de pago para Bordado.'
+            )
+            ->assertJsonPath(
+                'data.production_movement.status',
+                'completed'
+            );
+
+        $savedLog = $operationLog->fresh();
+
+        $this->assertNull($savedLog->payout_amount);
+
+        $this->assertSame(
+            'pending_configuration',
+            data_get($savedLog->payout_snapshot, 'payment_status')
+        );
+
+        $this->assertDatabaseHas('production_movements', [
+            'id' => $movement->id,
+            'status' => 'completed',
+        ]);
     }
 }
