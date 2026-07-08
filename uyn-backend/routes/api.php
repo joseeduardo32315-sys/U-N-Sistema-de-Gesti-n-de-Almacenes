@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\ProductionIncidentController;
 use App\Http\Controllers\Api\EmployeeCompensationController;
 use App\Http\Controllers\Api\PieceworkRateController;
 use App\Http\Controllers\Api\EmbroideryPaymentSettingController;
+use App\Http\Controllers\Api\PayrollPeriodController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -429,6 +430,62 @@ Route::prefix('v1')
                 'active.user',
                 'permission:payroll.manage',
             ])->name('embroidery-payment-settings.update');
+
+            // Rutas para PayrollPeriod
+            Route::get('/payroll-periods', [
+                PayrollPeriodController::class,
+                'index',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.view',
+            ])->name('payroll-periods.index');
+
+            Route::post('/payroll-periods', [
+                PayrollPeriodController::class,
+                'store',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.manage',
+            ])->name('payroll-periods.store');
+
+            Route::get('/payroll-periods/{payroll_period}', [
+                PayrollPeriodController::class,
+                'show',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.view',
+            ])->name('payroll-periods.show');
+
+            Route::match(
+                ['put', 'patch'],
+                '/payroll-periods/{payroll_period}',
+                [PayrollPeriodController::class, 'update']
+            )->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.manage',
+            ])->name('payroll-periods.update');
+
+            Route::post('/payroll-periods/{payroll_period}/generate', [
+                PayrollPeriodController::class,
+                'generate',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.generate',
+            ])->name('payroll-periods.generate');
+
+            Route::post('/payroll-periods/{payroll_period}/close', [
+                PayrollPeriodController::class,
+                'close',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:payroll.close',
+            ])->name('payroll-periods.close');
     });
 
 });

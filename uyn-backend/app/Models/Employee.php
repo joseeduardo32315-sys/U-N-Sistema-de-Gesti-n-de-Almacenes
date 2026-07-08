@@ -49,4 +49,11 @@ class Employee extends Model
     {
         return $this->hasMany(PieceworkRate::class);
     }
+
+    public function payrollSummaries(): HasMany
+    {
+        return $this->hasMany(
+            PayrollEmployeeSummary::class
+        );
+    }
 }

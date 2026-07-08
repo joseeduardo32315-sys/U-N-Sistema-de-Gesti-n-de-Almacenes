@@ -7,31 +7,36 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class EmployeeCompensation extends Model
+class PayrollEmployeeSummary extends Model
 {
     use HasFactory;
 
-    protected $table = 'employee_compensations';
-
     protected $fillable = [
+        'payroll_period_id',
         'employee_id',
         'payment_type',
-        'payment_frequency',
+        'piecework_amount',
         'fixed_amount',
-        'effective_from',
-        'effective_to',
+        'total_amount',
+        'details_count',
         'status',
+        'calculation_snapshot',
         'notes',
-        'created_by',
     ];
 
     protected function casts(): array
     {
         return [
+            'piecework_amount' => 'decimal:2',
             'fixed_amount' => 'decimal:2',
-            'effective_from' => 'date',
-            'effective_to' => 'date',
+            'total_amount' => 'decimal:2',
+            'calculation_snapshot' => 'array',
         ];
+    }
+
+    public function payrollPeriod(): BelongsTo
+    {
+        return $this->belongsTo(PayrollPeriod::class);
     }
 
     public function employee(): BelongsTo
@@ -39,15 +44,7 @@ class EmployeeCompensation extends Model
         return $this->belongsTo(Employee::class);
     }
 
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(
-            User::class,
-            'created_by'
-        );
-    }
-
-    public function payrollDetails(): HasMany
+    public function details(): HasMany
     {
         return $this->hasMany(PayrollDetail::class);
     }
