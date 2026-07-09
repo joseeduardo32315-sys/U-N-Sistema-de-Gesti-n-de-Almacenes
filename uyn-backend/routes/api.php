@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\EmployeeCompensationController;
 use App\Http\Controllers\Api\PieceworkRateController;
 use App\Http\Controllers\Api\EmbroideryPaymentSettingController;
 use App\Http\Controllers\Api\PayrollPeriodController;
+use App\Http\Controllers\Api\Report\PayrollReportController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -486,6 +487,25 @@ Route::prefix('v1')
                 'active.user',
                 'permission:payroll.close',
             ])->name('payroll-periods.close');
+
+            // Rutas para PayrollReport
+            Route::get('/reports/payroll-periods/{payroll_period}', [
+                PayrollReportController::class,
+                'period',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.view',
+            ])->name('reports.payroll-periods.show');
+
+            Route::get('/reports/payroll-employees', [
+                PayrollReportController::class,
+                'employees',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.view',
+            ])->name('reports.payroll-employees.index');
     });
 
 });
