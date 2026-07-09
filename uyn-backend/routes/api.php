@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\PieceworkRateController;
 use App\Http\Controllers\Api\EmbroideryPaymentSettingController;
 use App\Http\Controllers\Api\PayrollPeriodController;
 use App\Http\Controllers\Api\Report\PayrollReportController;
+use App\Http\Controllers\Api\Report\ProductionReportController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -506,6 +507,34 @@ Route::prefix('v1')
                 'active.user',
                 'permission:reports.view',
             ])->name('reports.payroll-employees.index');
+
+            // Rutas para ProductionReport
+            Route::get('/reports/production-cuts', [
+                ProductionReportController::class,
+                'cuts',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.view',
+            ])->name('reports.production-cuts.index');
+
+            Route::get('/reports/production-processes', [
+                ProductionReportController::class,
+                'processes',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.view',
+            ])->name('reports.production-processes.index');
+
+            Route::get('/reports/production-movements', [
+                ProductionReportController::class,
+                'movements',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.view',
+            ])->name('reports.production-movements.index');
     });
 
 });
