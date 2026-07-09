@@ -4,6 +4,7 @@ namespace App\Http\Resources\Report;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\PayrollDetailResource;
 
 class PayrollEmployeePaymentResource extends JsonResource
 {
@@ -53,6 +54,10 @@ class PayrollEmployeePaymentResource extends JsonResource
             'details_count' => $this->details_count,
 
             'status' => $this->status,
+
+            'details' => PayrollDetailResource::collection(
+                $this->whenLoaded('details')
+            ),
 
             'status_label' => match ($this->status) {
                 'generated' => 'Generado',
