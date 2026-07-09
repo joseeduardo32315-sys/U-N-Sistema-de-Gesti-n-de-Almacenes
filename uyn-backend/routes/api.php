@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\PayrollPeriodController;
 use App\Http\Controllers\Api\Report\PayrollReportController;
 use App\Http\Controllers\Api\Report\ProductionReportController;
 use App\Http\Controllers\Api\Report\ProductionIncidentReportController;
+use App\Http\Controllers\Api\Report\PayrollExportController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -564,6 +565,27 @@ Route::prefix('v1')
                 'active.user',
                 'permission:reports.view',
             ])->name('reports.production-reworks.index');
+
+            // Rutas para PayrollExport
+            Route::get('/reports/payroll-periods/{payroll_period}/export', [
+                PayrollExportController::class,
+                'period',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+                'permission:payroll.view',
+            ])->name('reports.payroll-periods.export');
+
+            Route::get('/reports/payroll-employees/export', [
+                PayrollExportController::class,
+                'employees',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+                'permission:payroll.view',
+            ])->name('reports.payroll-employees.export');
     });
 
 });

@@ -103,4 +103,47 @@ class PayrollReportService
         return $query->paginate($filters['per_page'] ?? 15)
             ->withQueryString();
     }
+
+    public function getEmployeePayrollReportForExport(
+        array $filters
+    ): Collection {
+        $paymentType = $filters['payment_type'] ?? 'all';
+        $status = $filters['status'] ?? 'all';
+
+        return PayrollEmployeeSummary::query()
+            ->with([
+                'employee.area',
+                'payrollPeriod',
+            ])
+            ->whereHas('payrollPeriod', function ($periodQuery) use (
+                $filters
+            ) {
+                $periodQuery
+                    ->whereDate('start_date', '<=', $filters['to'])
+                    ->whereDate('end_date', '>=', $filters['from']);
+            })
+            ->when(
+                $filters['employee_id'] ?? null,
+                fn ($summaryQuery, $employeeId) => $summaryQuery->where(
+                    'employee_id',
+                    $employeeId
+                )
+            )
+            ->when(
+                $paymentType !== 'all',
+                fn ($summaryQuery) => $summaryQuery->where(
+                    'payment_type',
+                    $paymentType
+                )
+            )
+            ->when(
+                $status !== 'all',
+                fn ($summaryQuery) => $summaryQuery->where(
+                    'status',
+                    $status
+                )
+            )
+            ->orderBy('employee_id')
+            ->get();
+    }
 }
