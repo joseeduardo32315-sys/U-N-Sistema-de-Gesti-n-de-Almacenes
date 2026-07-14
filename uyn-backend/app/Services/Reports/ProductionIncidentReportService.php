@@ -318,4 +318,151 @@ class ProductionIncidentReportService
             ],
         };
     }
+    public function getIncidentReportForExport(array $filters): Collection
+    {
+        $incidentType = $filters['incident_type'] ?? 'all';
+        $status = $filters['status'] ?? 'all';
+
+        return ProductionIncident::query()
+            ->with([
+                'garmentCut.garmentModel',
+                'productionMovement.process',
+                'productionMovement.operationProcess',
+                'productionMovement.fromArea',
+                'productionMovement.toArea',
+                'responsibleEmployee.area',
+                'resolvedBy',
+                'reworkMovement.process',
+                'reworkMovement.operationProcess',
+                'reworkMovement.fromArea',
+                'reworkMovement.toArea',
+            ])
+            ->when(
+                $filters['from'] ?? null,
+                fn ($query, $from) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $from
+                )
+            )
+            ->when(
+                $filters['to'] ?? null,
+                fn ($query, $to) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $to
+                )
+            )
+            ->when(
+                $incidentType !== 'all',
+                fn ($query) => $query->where(
+                    'incident_type',
+                    $incidentType
+                )
+            )
+            ->when(
+                $status !== 'all',
+                fn ($query) => $query->where('status', $status)
+            )
+            ->when(
+                $filters['garment_cut_id'] ?? null,
+                fn ($query, $cutId) => $query->where(
+                    'garment_cut_id',
+                    $cutId
+                )
+            )
+            ->when(
+                $filters['production_movement_id'] ?? null,
+                fn ($query, $movementId) => $query->where(
+                    'production_movement_id',
+                    $movementId
+                )
+            )
+            ->when(
+                $filters['responsible_employee_id'] ?? null,
+                fn ($query, $employeeId) => $query->where(
+                    'responsible_employee_id',
+                    $employeeId
+                )
+            )
+            ->when(
+                $filters['process_id'] ?? null,
+                fn ($query, $processId) => $query->whereHas(
+                    'productionMovement',
+                    fn ($movementQuery) => $movementQuery->where(
+                        'process_id',
+                        $processId
+                    )
+                )
+            )
+            ->latest('id')
+            ->get();
+    }
+
+    public function getLossReportForExport(array $filters): Collection
+    {
+        return $this->getLossReport($filters);
+    }
+
+    public function getReworkReportForExport(array $filters): Collection
+    {
+        $status = $filters['status'] ?? 'all';
+
+        return ProductionIncident::query()
+            ->with([
+                'garmentCut.garmentModel',
+                'productionMovement.process',
+                'productionMovement.fromArea',
+                'productionMovement.toArea',
+                'reworkMovement.process',
+                'reworkMovement.operationProcess',
+                'reworkMovement.fromArea',
+                'reworkMovement.toArea',
+                'responsibleEmployee.area',
+            ])
+            ->whereIn('incident_type', [
+                'damage',
+                'quality',
+            ])
+            ->whereHas('reworkMovement')
+            ->when(
+                $filters['from'] ?? null,
+                fn ($query, $from) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $from
+                )
+            )
+            ->when(
+                $filters['to'] ?? null,
+                fn ($query, $to) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $to
+                )
+            )
+            ->when(
+                $status !== 'all',
+                fn ($query) => $query->where('status', $status)
+            )
+            ->when(
+                $filters['garment_cut_id'] ?? null,
+                fn ($query, $cutId) => $query->where(
+                    'garment_cut_id',
+                    $cutId
+                )
+            )
+            ->when(
+                $filters['process_id'] ?? null,
+                fn ($query, $processId) => $query->whereHas(
+                    'productionMovement',
+                    fn ($movementQuery) => $movementQuery->where(
+                        'process_id',
+                        $processId
+                    )
+                )
+            )
+            ->latest('id')
+            ->get();
+    }
 }

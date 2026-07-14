@@ -26,6 +26,8 @@ use App\Http\Controllers\Api\Report\PayrollReportController;
 use App\Http\Controllers\Api\Report\ProductionReportController;
 use App\Http\Controllers\Api\Report\ProductionIncidentReportController;
 use App\Http\Controllers\Api\Report\PayrollExportController;
+use App\Http\Controllers\Api\Report\ProductionExportController;
+use App\Http\Controllers\Api\Report\ProductionIncidentExportController;
 
 Route::prefix('v1')
     ->name('api.v1.')
@@ -586,6 +588,61 @@ Route::prefix('v1')
                 'permission:reports.export',
                 'permission:payroll.view',
             ])->name('reports.payroll-employees.export');
+
+            // Rutas para ProductionExport
+            Route::get('/reports/production-cuts/export', [
+                ProductionExportController::class,
+                'cuts',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+            ])->name('reports.production-cuts.export');
+
+            Route::get('/reports/production-processes/export', [
+                ProductionExportController::class,
+                'processes',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+            ])->name('reports.production-processes.export');
+
+            Route::get('/reports/production-movements/export', [
+                ProductionExportController::class,
+                'movements',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+            ])->name('reports.production-movements.export');
+
+            Route::get('/reports/production-incidents/export', [
+                ProductionIncidentExportController::class,
+                'incidents',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+            ])->name('reports.production-incidents.export');
+
+            Route::get('/reports/production-losses/export', [
+                ProductionIncidentExportController::class,
+                'losses',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+            ])->name('reports.production-losses.export');
+
+            Route::get('/reports/production-reworks/export', [
+                ProductionIncidentExportController::class,
+                'reworks',
+            ])->middleware([
+                'auth:sanctum',
+                'active.user',
+                'permission:reports.export',
+            ])->name('reports.production-reworks.export');
     });
 
 });

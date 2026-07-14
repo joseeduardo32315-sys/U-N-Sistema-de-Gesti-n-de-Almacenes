@@ -548,4 +548,167 @@ class ProductionReportService
 
         return $result;
     }
+
+    public function getCutReportForExport(array $filters): Collection
+    {
+        $status = $filters['status'] ?? 'all';
+
+        $cuts = GarmentCut::query()
+            ->with([
+                'currentArea',
+                'garmentModel',
+                'productionOrder',
+            ])
+            ->when(
+                $filters['from'] ?? null,
+                fn ($query, $from) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $from
+                )
+            )
+            ->when(
+                $filters['to'] ?? null,
+                fn ($query, $to) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $to
+                )
+            )
+            ->when(
+                $status !== 'all',
+                fn ($query) => $query->where('status', $status)
+            )
+            ->when(
+                $filters['current_area_id'] ?? null,
+                fn ($query, $areaId) => $query->where(
+                    'current_area_id',
+                    $areaId
+                )
+            )
+            ->when(
+                $filters['garment_model_id'] ?? null,
+                fn ($query, $modelId) => $query->where(
+                    'garment_model_id',
+                    $modelId
+                )
+            )
+            ->when(
+                $filters['search'] ?? null,
+                function ($query, $search) {
+                    $query->where(function ($subQuery) use ($search) {
+                        $subQuery
+                            ->whereHas(
+                                'garmentModel',
+                                fn ($modelQuery) => $modelQuery
+                                    ->where('name', 'like', "%{$search}%")
+                                    ->orWhere('code', 'like', "%{$search}%")
+                            )
+                            ->orWhereHas(
+                                'productionOrder',
+                                fn ($orderQuery) => $orderQuery
+                                    ->where('code', 'like', "%{$search}%")
+                                    ->orWhere(
+                                        'order_code',
+                                        'like',
+                                        "%{$search}%"
+                                    )
+                            );
+                    });
+                }
+            )
+            ->latest('id')
+            ->get();
+
+        $this->attachCutStats($cuts);
+
+        return $cuts;
+    }
+
+    public function getProcessReportForExport(array $filters): Collection
+    {
+        return $this->getProcessReport($filters);
+    }
+
+    public function getMovementReportForExport(array $filters): Collection
+    {
+        $status = $filters['status'] ?? 'all';
+
+        $movements = ProductionMovement::query()
+            ->with([
+                'garmentCut.garmentModel',
+                'process',
+                'operationProcess',
+                'fromArea',
+                'toArea',
+            ])
+            ->when(
+                $filters['from'] ?? null,
+                fn ($query, $from) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $from
+                )
+            )
+            ->when(
+                $filters['to'] ?? null,
+                fn ($query, $to) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $to
+                )
+            )
+            ->when(
+                $filters['garment_cut_id'] ?? null,
+                fn ($query, $cutId) => $query->where(
+                    'garment_cut_id',
+                    $cutId
+                )
+            )
+            ->when(
+                $filters['process_id'] ?? null,
+                fn ($query, $processId) => $query->where(
+                    'process_id',
+                    $processId
+                )
+            )
+            ->when(
+                $filters['operation_process_id'] ?? null,
+                fn ($query, $operationId) => $query->where(
+                    'operation_process_id',
+                    $operationId
+                )
+            )
+            ->when(
+                $filters['from_area_id'] ?? null,
+                fn ($query, $areaId) => $query->where(
+                    'from_area_id',
+                    $areaId
+                )
+            )
+            ->when(
+                $filters['to_area_id'] ?? null,
+                fn ($query, $areaId) => $query->where(
+                    'to_area_id',
+                    $areaId
+                )
+            )
+            ->when(
+                $filters['target_type'] ?? null,
+                fn ($query, $targetType) => $query->where(
+                    'target_type',
+                    $targetType
+                )
+            )
+            ->when(
+                $status !== 'all',
+                fn ($query) => $query->where('status', $status)
+            )
+            ->latest('id')
+            ->get();
+
+        $this->attachMovementStats($movements);
+
+        return $movements;
+    }
 }
