@@ -1,0 +1,30 @@
+Actúa como un Arquitecto de Software Senior y Experto en Vue 3 con TypeScript. Estoy desarrollando el frontend del ERP "U&N Moda Infantil" que consume una API en Laravel 13. Siento que la lógica de mi frontend se está desviando de los requerimientos y reglas de negocio.
+
+Tu objetivo es auditar estrictamente el código de mi frontend que te proporcionaré al final, contrastándolo con las reglas del negocio, los requerimientos funcionales (RF) y las recomendaciones de integración documentadas.
+
+--- CONTEXTO Y REGLAS ESTRICTAS DEL PROYECTO ---
+
+1. STACK Y ARQUITECTURA FRONTEND:
+- Debe usar Vue 3 + TypeScript[cite: 2].
+- Las peticiones HTTP deben usar Axios, interceptando el token de `localStorage` y enviándolo como `Bearer`[cite: 2].
+- El manejo del estado y autenticación debe integrarse (preferentemente con Pinia), validando permisos en el frontend mediante funciones como `can()` o `hasRole()`[cite: 2].
+- La interfaz debe responder en un tiempo de 1 a 3 segundos en operaciones comunes[cite: 1].
+
+2. REGLAS DE NEGOCIO CRÍTICAS A VALIDAR:
+- Producción y Cortes: La cantidad planeada de un corte NO se altera por pérdidas; las pérdidas resueltas reducen la cantidad efectiva[cite: 2]. Un complemento no se calcula por resta, es una ruta lógica[cite: 2].
+- Movimientos: No se despacha si hay incidencias abiertas bloqueantes y un movimiento debe recibirse antes de operar[cite: 2].
+- Incidencias y Reprocesos: Las incidencias de tipo `quality` y `damage` pueden generar reprocesos, lo cual cancela el movimiento origen[cite: 2].
+- Nómina y Bordado: El pago se congela al completar una operación[cite: 2]. La fórmula de bordado usa puntadas, aplicaciones, porcentaje y un mínimo/default[cite: 2].
+
+3. ESTÁNDARES DE RESPUESTA DE LA API:
+- Debo manejar correctamente la paginación estándar que devuelve la API en formato `data`, `links` y `meta`[cite: 2].
+- Debo capturar correctamente los errores de validación (código HTTP 422) que vienen en la estructura `errors: { field: ["Mensaje"] }`[cite: 2].
+
+--- CÓDIGO FRONTEND A AUDITAR ---
+Todo el codigo del frontend
+
+--- TAREAS DE AUDITORÍA ---
+1. ALINEACIÓN CON REGLAS DE NEGOCIO: Revisa línea por línea si el código está violando alguna regla operativa (ej. permitiendo registrar movimientos sin validar incidencias, calculando mal el bordado, o exponiendo módulos a roles sin el permiso adecuado).
+2. SOBRE-INGENIERÍA O DESVIACIÓN: Identifica si estoy escribiendo lógica en el frontend (Vue) que en realidad le corresponde procesar al backend (Laravel), o si estoy creando flujos redundantes.
+3. BUENAS PRÁCTICAS VUE 3 / TS: Verifica que el tipado de TypeScript coincida con las interfaces esperadas por la API (ej. `PaginatedResponse<T>`, `AuthUser`) y que esté usando correctamente la Composition API.
+4. ACCIONES CORRECTIVAS DIRECTAS: Proporciona el código exacto refactorizado, eliminando lo innecesario y ajustándolo a las reglas. Sé directo y estricto.

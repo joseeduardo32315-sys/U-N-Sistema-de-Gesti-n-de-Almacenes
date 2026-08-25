@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Diagrama Entidad-Relación - U&N Sistema de Gestión de Almacenes y Producción</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+  
+  :root {
+    --bg-main: #0b0f19;
+    --bg-card: #111827;
+    --bg-card-header: #1e293b;
+    --border-color: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    
+    --c-security: #3b82f6;
+    --c-catalog: #06b6d4;
+    --c-production: #10b981;
+    --c-movement: #f59e0b;
+    --c-incident: #ef4444;
+    --c-rates: #8b5cf6;
+    --c-payroll: #ec4899;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    padding: 40px;
+    width: 3600px;
+  }
+
+  /* Header Section */
+  .header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 30px 45px;
+    margin-bottom: 35px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .title-area h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .title-area h1 span.accent {
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .title-area p {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  .meta-badges {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    padding: 8px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pill-blue { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; color: #60a5fa; }
+  .pill-green { background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #34d399; }
+  .pill-purple { background: rgba(139, 92, 246, 0.15); border-color: #8b5cf6; color: #a78bfa; }
+  .pill-pink { background: rgba(236, 72, 153, 0.15); border-color: #ec4899; color: #f472b6; }
+
+  /* Modules Grid */
+  .modules-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 35px;
+  }
+
+  .module-section {
+    background: #0f172a;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .module-header {
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .module-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+  }
+
+  /* Table Cards */
+  .table-card {
+    background: var(--bg-card);
+    border: 1px solid #1f2937;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 9px 12px;
+    background: #1e293b;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .table-name {
+    font-family: 'Fira Code', monospace;
+    font-weight: 700;
+    font-size: 13.5px;
+  }
+
+  .table-desc {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: 6px;
+  }
+
+  .table-rows {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .table-rows tr {
+    border-bottom: 1px solid #1a2234;
+  }
+
+  .table-rows tr:last-child {
+    border-bottom: none;
+  }
+
+  .table-rows td {
+    padding: 6px 11px;
+  }
+
+  .col-name {
+    font-family: 'Fira Code', monospace;
+    font-size: 12px;
+    color: #e2e8f0;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .col-type {
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+
+  .col-key {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .key-badge {
+    display: inline-block;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Fira Code', monospace;
+  }
+
+  .key-pk { background: #b91c1c; color: #fee2e2; }
+  .key-fk { background: #0369a1; color: #e0f2fe; }
+  .key-uk { background: #854d0e; color: #fef9c3; }
+  .key-pkfk { background: #6d28d9; color: #ede9fe; }
+
+  .col-info {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* Module Color Themes */
+  .mod-sec .module-header { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-left: 4px solid var(--c-security); }
+  .mod-sec .table-name { color: #60a5fa; }
+  
+  .mod-cat .module-header { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border-left: 4px solid var(--c-catalog); }
+  .mod-cat .table-name { color: #22d3ee; }
+
+  .mod-prod .module-header { background: rgba(16, 185, 129, 0.15); color: #34d399; border-left: 4px solid var(--c-production); }
+  .mod-prod .table-name { color: #34d399; }
+
+  .mod-mov .module-header { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-left: 4px solid var(--c-movement); }
+  .mod-mov .table-name { color: #fbbf24; }
+
+  .mod-inc .module-header { background: rgba(239, 68, 68, 0.15); color: #f87171; border-left: 4px solid var(--c-incident); }
+  .mod-inc .table-name { color: #f87171; }
+
+  .mod-rates .module-header { background: rgba(139, 92, 246, 0.15); color: #c084fc; border-left: 4px solid var(--c-rates); }
+  .mod-rates .table-name { color: #c084fc; }
+
+  .mod-pay .module-header { background: rgba(236, 72, 153, 0.15); color: #f472b6; border-left: 4px solid var(--c-payroll); }
+  .mod-pay .table-name { color: #f472b6; }
+
+  /* Relationships Diagram Section */
+  .diagram-full-section {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .diagram-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #1e293b;
+    padding-bottom: 12px;
+  }
+
+  .diagram-header h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mermaid-wrapper {
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+    background: #0b0f19;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 35px 20px;
+    min-height: 1100px;
+  }
+
+  .legend-box {
+    margin-top: 25px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 16px 25px;
+    display: flex;
+    gap: 25px;
+    justify-content: space-around;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #cbd5e1;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <div class="header">
+    <div class="title-area">
+      <h1>DIAGRAMA <span class="accent">ENTIDAD-RELACIÓN</span> (BASE DE DATOS)</h1>
+      <p>Sistema Integral de Gestión de Almacenes, Trazabilidad de Producción Textil y Nómina por Destajo &bull; <strong>U&N Moda Infantil</strong></p>
+    </div>
+    <div class="meta-badges">
+      <div class="pill pill-blue">Framework: Laravel 11 / Sanctum</div>
+      <div class="pill pill-green">29 Tablas Principales</div>
+      <div class="pill pill-purple">7 Módulos Funcionales</div>
+      <div class="pill pill-pink">Motor: MySQL / MariaDB (InnoDB)</div>
+    </div>
+  </div>
+
+  <!-- Modules Grid: Columns 1 to 4 -->
+  <div class="modules-container">
+    
+    <!-- 1. Seguridad y Auditoría -->
+    <div class="module-section mod-sec">
+      <div class="module-header">
+        <span>1. Seguridad y Auditoría</span>
+        <span class="pill pill-blue">5 Tablas</span>
+      </div>
+      <div class="module-body">
+        
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">users</span>
+            <span class="table-desc">Usuarios del sistema</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID usuario</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR(255)</td><td class="col-key"></td><td class="col-info">Nombre completo</td></tr>
+            <tr><td class="col-name">username</td><td class="col-type">VARCHAR(255)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">Usuario login</td></tr>
+            <tr><td class="col-name">email</td><td class="col-type">VARCHAR(255)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">Correo login</td></tr>
+            <tr><td class="col-name">password</td><td class="col-type">VARCHAR(255)</td><td class="col-key"></td><td class="col-info">Hash password</td></tr>
+            <tr><td class="col-name">status</td><td class="col-type">ENUM</td><td class="col-key"></td><td class="col-info">active | inactive</td></tr>
+            <tr><td class="col-name">timestamps</td><td class="col-type">TIMESTAMP</td><td class="col-key"></td><td class="col-info">created/updated</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">roles / permissions</span>
+            <span class="table-desc">Spatie RBAC</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">roles.id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">admin, supervisor...</td></tr>
+            <tr><td class="col-name">permissions.id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">cuts.create, etc.</td></tr>
+            <tr><td class="col-name">model_has_roles</td><td class="col-type">PIVOT</td><td class="col-key"><span class="key-badge key-pkfk">PK/FK</span></td><td class="col-info">user &lt;&gt; role</td></tr>
+            <tr><td class="col-name">role_has_permissions</td><td class="col-type">PIVOT</td><td class="col-key"><span class="key-badge key-pkfk">PK/FK</span></td><td class="col-info">role &lt;&gt; permission</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">operation_logs</span>
+            <span class="table-desc">Auditoría global de acciones</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID log</td></tr>
+            <tr><td class="col-name">user_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; users.id (nullable)</td></tr>
+            <tr><td class="col-name">module / action</td><td class="col-type">VARCHAR(80)</td><td class="col-key"></td><td class="col-info">GarmentCut, create...</td></tr>
+            <tr><td class="col-name">subject_type / id</td><td class="col-type">MORPH</td><td class="col-key"></td><td class="col-info">Entidad afectada</td></tr>
+            <tr><td class="col-name">old_values / new_values</td><td class="col-type">JSON</td><td class="col-key"></td><td class="col-info">Snapshot cambios</td></tr>
+            <tr><td class="col-name">ip_address</td><td class="col-type">VARCHAR(45)</td><td class="col-key"></td><td class="col-info">IP cliente</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. Catálogos Base -->
+    <div class="module-section mod-cat">
+      <div class="module-header">
+        <span>2. Catálogos y Organización</span>
+        <span class="pill pill-blue">7 Tablas</span>
+      </div>
+      <div class="module-body">
+        
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">areas</span>
+            <span class="table-desc">Áreas de taller</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID área</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR(100)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">Corte, Bordado, etc.</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">employees</span>
+            <span class="table-desc">Operadores y maquileros</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID trabajador</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR(150)</td><td class="col-key"></td><td class="col-info">Nombre empleado</td></tr>
+            <tr><td class="col-name">area_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; areas.id</td></tr>
+            <tr><td class="col-name">worker_type</td><td class="col-type">VARCHAR(20)</td><td class="col-key"></td><td class="col-info">internal | external</td></tr>
+            <tr><td class="col-name">status</td><td class="col-type">VARCHAR(20)</td><td class="col-key"></td><td class="col-info">active | inactive</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">garment_models</span>
+            <span class="table-desc">Modelos de prendas</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID modelo</td></tr>
+            <tr><td class="col-name">code</td><td class="col-type">VARCHAR(50)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">Código de prenda</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR(150)</td><td class="col-key"></td><td class="col-info">Nombre de diseño</td></tr>
+            <tr><td class="col-name">size_range</td><td class="col-type">VARCHAR(100)</td><td class="col-key"></td><td class="col-info">2 a 8, CH-G...</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">sizes &bull; piece_types</span>
+            <span class="table-desc">Tallas y Partes</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">sizes.id / name</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">2, 4, 6, 8...</td></tr>
+            <tr><td class="col-name">piece_types.id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">Delantero, Trasero...</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">processes &bull; operations</span>
+            <span class="table-desc">Flujo técnico</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">processes.id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">Macroproceso</td></tr>
+            <tr><td class="col-name">operation_processes.id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">Sub-operación</td></tr>
+            <tr><td class="col-name">op.process_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; processes.id</td></tr>
+            <tr><td class="col-name">op.payroll_calc</td><td class="col-type">VARCHAR(30)</td><td class="col-key"></td><td class="col-info">per_piece, etc.</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. Órdenes y Cortes de Producción -->
+    <div class="module-section mod-prod">
+      <div class="module-header">
+        <span>3. Órdenes y Cortes</span>
+        <span class="pill pill-green">5 Tablas</span>
+      </div>
+      <div class="module-body">
+        
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">production_orders</span>
+            <span class="table-desc">Órdenes maestras</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID orden</td></tr>
+            <tr><td class="col-name">order_code</td><td class="col-type">VARCHAR(50)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">OP-2026-001</td></tr>
+            <tr><td class="col-name">status / priority</td><td class="col-type">VARCHAR</td><td class="col-key"></td><td class="col-info">registered, normal...</td></tr>
+            <tr><td class="col-name">start_date / end_date</td><td class="col-type">DATE</td><td class="col-key"></td><td class="col-info">Fechas plan</td></tr>
+            <tr><td class="col-name">created_by</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; users.id</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">garment_cuts</span>
+            <span class="table-desc">Lotes de cortes de tela</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID corte</td></tr>
+            <tr><td class="col-name">production_order_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; production_orders.id</td></tr>
+            <tr><td class="col-name">garment_model_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; garment_models.id</td></tr>
+            <tr><td class="col-name">code</td><td class="col-type">VARCHAR(50)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">CUT-PM23-001</td></tr>
+            <tr><td class="col-name">total_pieces</td><td class="col-type">INT</td><td class="col-key"></td><td class="col-info">Total piezas</td></tr>
+            <tr><td class="col-name">current_area_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; areas.id (Ubicación)</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">garment_cut_sizes</span>
+            <span class="table-desc">Piezas por talla</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID</td></tr>
+            <tr><td class="col-name">garment_cut_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; garment_cuts.id (CASCADE)</td></tr>
+            <tr><td class="col-name">size_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; sizes.id</td></tr>
+            <tr><td class="col-name">total_pieces</td><td class="col-type">INT</td><td class="col-key"></td><td class="col-info">Cantidad por talla</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">garment_cut_complements</span>
+            <span class="table-desc">Tracking 1:1 de complementos</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID complemento</td></tr>
+            <tr><td class="col-name">garment_cut_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pkfk">FK, UK</span></td><td class="col-info">&rarr; garment_cuts.id (1:1)</td></tr>
+            <tr><td class="col-name">current_area_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; areas.id</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">special_process_pieces</span>
+            <span class="table-desc">Piezas de ruta especial</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID pieza esp.</td></tr>
+            <tr><td class="col-name">garment_cut_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; garment_cuts.id</td></tr>
+            <tr><td class="col-name">piece_type_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; piece_types.id</td></tr>
+            <tr><td class="col-name">process_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; processes.id (ej. Bordado)</td></tr>
+            <tr><td class="col-name">current_area_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; areas.id</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. Flujo de Taller, Calidad y Destajo -->
+    <div class="module-section mod-mov">
+      <div class="module-header">
+        <span>4. Flujo, Calidad y Destajos</span>
+        <span class="pill pill-pink">3 Tablas Clave</span>
+      </div>
+      <div class="module-body">
+        
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">production_movements</span>
+            <span class="table-desc">Transferencias entre áreas</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID pase</td></tr>
+            <tr><td class="col-name">garment_cut_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; garment_cuts.id</td></tr>
+            <tr><td class="col-name">return_incident_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-uk">FK, UK</span></td><td class="col-info">&rarr; production_incidents.id (Reproceso)</td></tr>
+            <tr><td class="col-name">target_type</td><td class="col-type">VARCHAR(30)</td><td class="col-key"></td><td class="col-info">cut | complement | special_piece</td></tr>
+            <tr><td class="col-name">special_process_piece_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; special_process_pieces.id</td></tr>
+            <tr><td class="col-name">complement_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; garment_cut_complements.id</td></tr>
+            <tr><td class="col-name">from_area_id / to_area_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; areas.id (Origen/Destino)</td></tr>
+            <tr><td class="col-name">process_id / op_process_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; processes / operation_processes</td></tr>
+            <tr><td class="col-name">quantity / status</td><td class="col-type">INT / STR</td><td class="col-key"></td><td class="col-info">Cantidad y estado</td></tr>
+            <tr><td class="col-name">created_by / received_by</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; users.id</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">production_operation_logs</span>
+            <span class="table-desc">Tickets de trabajo (Destajo)</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID avance</td></tr>
+            <tr><td class="col-name">production_movement_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; production_movements.id</td></tr>
+            <tr><td class="col-name">operation_process_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; operation_processes.id</td></tr>
+            <tr><td class="col-name">employee_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; employees.id (Operador)</td></tr>
+            <tr><td class="col-name">stitches / apps_count</td><td class="col-type">INT</td><td class="col-key"></td><td class="col-info">Métricas bordado</td></tr>
+            <tr><td class="col-name">quantity_processed</td><td class="col-type">INT</td><td class="col-key"></td><td class="col-info">Piezas trabajadas</td></tr>
+            <tr><td class="col-name">payout_amount</td><td class="col-type">DECIMAL</td><td class="col-key"></td><td class="col-info">Total a pagar destajo</td></tr>
+            <tr><td class="col-name">payout_snapshot</td><td class="col-type">JSON</td><td class="col-key"></td><td class="col-info">Snapshot cálculo</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">production_incidents</span>
+            <span class="table-desc">Mermas y defectos</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID incidencia</td></tr>
+            <tr><td class="col-name">garment_cut_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; garment_cuts.id</td></tr>
+            <tr><td class="col-name">production_movement_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; production_movements.id</td></tr>
+            <tr><td class="col-name">incident_type</td><td class="col-type">VARCHAR(30)</td><td class="col-key"></td><td class="col-info">damage, loss, quality...</td></tr>
+            <tr><td class="col-name">quantity_affected</td><td class="col-type">INT</td><td class="col-key"></td><td class="col-info">Piezas defectuosas</td></tr>
+            <tr><td class="col-name">responsible_employee_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; employees.id (nullable)</td></tr>
+            <tr><td class="col-name">resolved_by</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; users.id (nullable)</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Row: Tarifas y Nómina -->
+  <div class="modules-container" style="grid-template-columns: 1fr 1fr; margin-bottom: 35px;">
+    
+    <!-- 5. Tarifas y Compensaciones -->
+    <div class="module-section mod-rates">
+      <div class="module-header">
+        <span>5. Tarifas y Esquemas Salariales</span>
+        <span class="pill pill-purple">3 Tablas Paramétricas</span>
+      </div>
+      <div class="module-body" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">employee_compensations</span>
+            <span class="table-desc">Compensación fija</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID esquema</td></tr>
+            <tr><td class="col-name">employee_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; employees.id</td></tr>
+            <tr><td class="col-name">payment_type</td><td class="col-type">VARCHAR(20)</td><td class="col-key"></td><td class="col-info">piecework | fixed</td></tr>
+            <tr><td class="col-name">fixed_amount</td><td class="col-type">DECIMAL(12,2)</td><td class="col-key"></td><td class="col-info">Sueldo fijo base</td></tr>
+            <tr><td class="col-name">effective_from / to</td><td class="col-type">DATE</td><td class="col-key"></td><td class="col-info">Vigencia</td></tr>
+            <tr><td class="col-name">created_by</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; users.id</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">piecework_rates</span>
+            <span class="table-desc">Tarifas por pieza</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID tarifa</td></tr>
+            <tr><td class="col-name">employee_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; employees.id</td></tr>
+            <tr><td class="col-name">operation_process_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; operation_processes.id</td></tr>
+            <tr><td class="col-name">amount_per_piece</td><td class="col-type">DECIMAL(12,4)</td><td class="col-key"></td><td class="col-info">Tarifa por pieza</td></tr>
+            <tr><td class="col-name">effective_from / to</td><td class="col-type">DATE</td><td class="col-key"></td><td class="col-info">Vigencia</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">embroidery_payment_settings</span>
+            <span class="table-desc">Bordado</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID config</td></tr>
+            <tr><td class="col-name">operation_process_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; operation_processes.id</td></tr>
+            <tr><td class="col-name">stitch_price / app_price</td><td class="col-type">DECIMAL</td><td class="col-key"></td><td class="col-info">Precio puntada/aplique</td></tr>
+            <tr><td class="col-name">payment_percentage</td><td class="col-type">DECIMAL</td><td class="col-key"></td><td class="col-info">% destajista</td></tr>
+            <tr><td class="col-name">min_payment_per_piece</td><td class="col-type">DECIMAL</td><td class="col-key"></td><td class="col-info">Mínimo garantizado</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 6. Nómina y Liquidación -->
+    <div class="module-section mod-pay">
+      <div class="module-header">
+        <span>6. Gestión y Liquidación de Nómina</span>
+        <span class="pill pill-pink">3 Tablas de Nómina</span>
+      </div>
+      <div class="module-body" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+        
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">payroll_periods</span>
+            <span class="table-desc">Ciclos de nómina</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID periodo</td></tr>
+            <tr><td class="col-name">code</td><td class="col-type">VARCHAR(50)</td><td class="col-key"><span class="key-badge key-uk">UK</span></td><td class="col-info">NOM-2026-W30</td></tr>
+            <tr><td class="col-name">frequency</td><td class="col-type">VARCHAR(20)</td><td class="col-key"></td><td class="col-info">weekly, biweekly...</td></tr>
+            <tr><td class="col-name">start_date / end_date</td><td class="col-type">DATE</td><td class="col-key"></td><td class="col-info">Rango de fechas</td></tr>
+            <tr><td class="col-name">status</td><td class="col-type">VARCHAR(20)</td><td class="col-key"></td><td class="col-info">draft, closed...</td></tr>
+            <tr><td class="col-name">created/gen/closed_by</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; users.id</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">payroll_employee_summaries</span>
+            <span class="table-desc">Resumen trabajador</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID resumen</td></tr>
+            <tr><td class="col-name">payroll_period_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; payroll_periods.id</td></tr>
+            <tr><td class="col-name">employee_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; employees.id</td></tr>
+            <tr><td class="col-name">payment_type</td><td class="col-type">VARCHAR(20)</td><td class="col-key"></td><td class="col-info">piecework, fixed, mixed</td></tr>
+            <tr><td class="col-name">piecework / fixed_amount</td><td class="col-type">DECIMAL</td><td class="col-key"></td><td class="col-info">Subtotales</td></tr>
+            <tr><td class="col-name">total_amount</td><td class="col-type">DECIMAL(14,2)</td><td class="col-key"></td><td class="col-info">Total bruto a pagar</td></tr>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <span class="table-name">payroll_details</span>
+            <span class="table-desc">Tickets liquidados</span>
+          </div>
+          <table class="table-rows">
+            <tr><td class="col-name">id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-pk">PK</span></td><td class="col-info">ID detalle</td></tr>
+            <tr><td class="col-name">payroll_employee_summary_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; summaries.id</td></tr>
+            <tr><td class="col-name">source_type</td><td class="col-type">VARCHAR(30)</td><td class="col-key"></td><td class="col-info">operation_log | fixed</td></tr>
+            <tr><td class="col-name">production_operation_log_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-uk">FK, UK</span></td><td class="col-info">&rarr; op_logs.id (1:1)</td></tr>
+            <tr><td class="col-name">employee_compensation_id</td><td class="col-type">BIGINT</td><td class="col-key"><span class="key-badge key-fk">FK</span></td><td class="col-info">&rarr; compensations.id</td></tr>
+            <tr><td class="col-name">amount</td><td class="col-type">DECIMAL(14,2)</td><td class="col-key"></td><td class="col-info">Monto liquidado</td></tr>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Big Interactive Mermaid Topology Section -->
+  <div class="diagram-full-section">
+    <div class="diagram-header">
+      <h2>MAPA TOPOLÓGICO DE RELACIONES (ENTIDAD - RELACIÓN)</h2>
+      <div class="pill pill-blue">Mermaid ER Layout &bull; Cardinalidades 1:1, 1:N y N:M</div>
+    </div>
+    
+    <div class="mermaid-wrapper">
+      <div class="mermaid">
+erDiagram
+    %% Core Security & Users
+    USERS ||--o{ PRODUCTION_ORDERS : "created_by"
+    USERS ||--o{ PRODUCTION_MOVEMENTS : "created_by / received_by"
+    USERS ||--o{ PRODUCTION_INCIDENTS : "resolved_by"
+    USERS ||--o{ EMPLOYEE_COMPENSATIONS : "created_by"
+    USERS ||--o{ PIECEWORK_RATES : "created_by"
+    USERS ||--o{ EMBROIDERY_PAYMENT_SETTINGS : "created_by"
+    USERS ||--o{ PAYROLL_PERIODS : "created_by / generated_by / closed_by"
+    USERS ||--o{ OPERATION_LOGS : "user_id"
+    USERS ||--o{ PERSONAL_ACCESS_TOKENS : "tokenable"
+
+    %% Spatie RBAC
+    ROLES ||--o{ MODEL_HAS_ROLES : "role_id"
+    PERMISSIONS ||--o{ MODEL_HAS_PERMISSIONS : "permission_id"
+    ROLES ||--o{ ROLE_HAS_PERMISSIONS : "role_id"
+    PERMISSIONS ||--o{ ROLE_HAS_PERMISSIONS : "permission_id"
+
+    %% Areas & Employees
+    AREAS ||--o{ EMPLOYEES : "area_id"
+    AREAS ||--o{ GARMENT_CUTS : "current_area_id"
+    AREAS ||--o{ GARMENT_CUT_COMPLEMENTS : "current_area_id"
+    AREAS ||--o{ SPECIAL_PROCESS_PIECES : "current_area_id"
+    AREAS ||--o{ PRODUCTION_MOVEMENTS : "from_area_id / to_area_id"
+
+    %% Orders & Garment Cuts Structure
+    PRODUCTION_ORDERS ||--o{ GARMENT_CUTS : "production_order_id"
+    GARMENT_MODELS ||--o{ GARMENT_CUTS : "garment_model_id"
+    GARMENT_CUTS ||--o{ GARMENT_CUT_SIZES : "garment_cut_id"
+    SIZES ||--o{ GARMENT_CUT_SIZES : "size_id"
+    GARMENT_CUTS ||--o| GARMENT_CUT_COMPLEMENTS : "garment_cut_id (1:1)"
+    GARMENT_CUTS ||--o{ SPECIAL_PROCESS_PIECES : "garment_cut_id"
+    PIECE_TYPES ||--o{ SPECIAL_PROCESS_PIECES : "piece_type_id"
+
+    %% Processes & Technical Steps
+    PROCESSES ||--o{ OPERATION_PROCESSES : "process_id"
+    PROCESSES ||--o{ SPECIAL_PROCESS_PIECES : "process_id"
+    PROCESSES ||--o{ PRODUCTION_MOVEMENTS : "process_id"
+    OPERATION_PROCESSES ||--o{ PRODUCTION_MOVEMENTS : "operation_process_id"
+    OPERATION_PROCESSES ||--o{ PRODUCTION_OPERATION_LOGS : "operation_process_id"
+    OPERATION_PROCESSES ||--o{ PIECEWORK_RATES : "operation_process_id"
+    OPERATION_PROCESSES ||--o{ EMBROIDERY_PAYMENT_SETTINGS : "operation_process_id"
+
+    %% Movements & Workshop Tracking
+    GARMENT_CUTS ||--o{ PRODUCTION_MOVEMENTS : "garment_cut_id"
+    SPECIAL_PROCESS_PIECES ||--o{ PRODUCTION_MOVEMENTS : "special_process_piece_id"
+    GARMENT_CUT_COMPLEMENTS ||--o{ PRODUCTION_MOVEMENTS : "complement_id"
+    PRODUCTION_MOVEMENTS ||--o{ PRODUCTION_OPERATION_LOGS : "production_movement_id"
+    EMPLOYEES ||--o{ PRODUCTION_OPERATION_LOGS : "employee_id"
+
+    %% Quality Incidents
+    GARMENT_CUTS ||--o{ PRODUCTION_INCIDENTS : "garment_cut_id"
+    PRODUCTION_MOVEMENTS ||--o{ PRODUCTION_INCIDENTS : "production_movement_id"
+    PRODUCTION_INCIDENTS ||--o| PRODUCTION_MOVEMENTS : "return_incident_id (rework 1:1)"
+    EMPLOYEES ||--o{ PRODUCTION_INCIDENTS : "responsible_employee_id"
+
+    %% Rates & Compensation Schemas
+    EMPLOYEES ||--o{ EMPLOYEE_COMPENSATIONS : "employee_id"
+    EMPLOYEES ||--o{ PIECEWORK_RATES : "employee_id"
+
+    %% Payroll Settlement
+    PAYROLL_PERIODS ||--o{ PAYROLL_EMPLOYEE_SUMMARIES : "payroll_period_id"
+    EMPLOYEES ||--o{ PAYROLL_EMPLOYEE_SUMMARIES : "employee_id"
+    PAYROLL_EMPLOYEE_SUMMARIES ||--o{ PAYROLL_DETAILS : "payroll_employee_summary_id"
+    PRODUCTION_OPERATION_LOGS ||--o| PAYROLL_DETAILS : "production_operation_log_id (1:1)"
+    EMPLOYEE_COMPENSATIONS ||--o{ PAYROLL_DETAILS : "employee_compensation_id"
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend-box">
+      <div class="legend-item"><span class="key-badge key-pk">PK</span> Clave Primaria (Primary Key)</div>
+      <div class="legend-item"><span class="key-badge key-fk">FK</span> Clave Foránea (Foreign Key)</div>
+      <div class="legend-item"><span class="key-badge key-uk">UK</span> Índice Único (Unique Key)</div>
+      <div class="legend-item"><span class="key-badge key-pkfk">PK, FK</span> Clave Primaria Compuesta</div>
+      <div class="legend-item"><strong>||--o{</strong> Relación Uno a Muchos (1:N)</div>
+      <div class="legend-item"><strong>||--o|</strong> Relación Uno a Cero/Uno (1:1)</div>
+    </div>
+
+  </div>
+
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#0b0f19',
+        primaryColor: '#1e293b',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#38bdf8',
+        lineColor: '#38bdf8',
+        secondaryColor: '#334155',
+        tertiaryColor: '#1e293b',
+        fontFamily: 'Plus Jakarta Sans, sans-serif',
+        fontSize: '13px'
+      },
+      er: {
+        useMaxWidth: false,
+        layoutDirection: 'TB'
+      }
+    });
+  </script>
+</body>
+</html>

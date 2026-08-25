@@ -61,7 +61,7 @@ class IndexGarmentCutRequest extends FormRequest
                 'nullable',
                 'integer',
                 'min:1',
-                'nax:100',
+                'max:100',
             ],
         ];
     }

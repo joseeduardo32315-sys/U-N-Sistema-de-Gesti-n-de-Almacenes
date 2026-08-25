@@ -1,0 +1,70 @@
+.button {
+  display: inline-flex;
+  min-height: var(--touch-target-min);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.7rem 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button--primary {
+  color: var(--color-white);
+  background: var(--color-brand-orange-800);
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--color-brand-orange-900);
+}
+
+.button--secondary {
+  color: var(--color-white);
+  background: var(--color-brand-green-700);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: var(--color-brand-green-800);
+}
+
+.button--soft {
+  color: var(--color-text);
+  background: var(--color-brand-green-100);
+  border-color: var(--color-brand-green-300);
+}
+
+.button--outline {
+  color: var(--color-text);
+  background: var(--color-white);
+  border-color: var(--color-border-strong);
+}
+
+.button--danger {
+  color: var(--color-white);
+  background: var(--color-danger);
+}
+
+.button--full-mobile {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .button--full-mobile {
+    width: auto;
+  }
+}
