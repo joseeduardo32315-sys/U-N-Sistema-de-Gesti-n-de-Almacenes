@@ -269,7 +269,7 @@ router.beforeEach(async (to) => {
 router.afterEach((to) => {
   const appName =
     import.meta.env.VITE_APP_NAME ??
-    'ERP U&N Moda Infantil'
+    'Sistema de Administración y Control de Procesos (SACOP)'
 
   document.title = to.meta.title
     ? `${to.meta.title} | ${appName}`

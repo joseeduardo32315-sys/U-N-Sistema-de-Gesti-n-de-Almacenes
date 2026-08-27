@@ -7,7 +7,6 @@ import {
   ArrowRight,
   BarChart3,
   CheckCircle,
-  Clock,
   Layers,
   LayoutDashboard,
   LogOut,
@@ -60,22 +59,13 @@ const completedCutsCount = computed(() => {
   return cuts.value.filter((c) => c.status === 'completed').length
 })
 
-const delayedCutsCount = computed(() => {
-  return cuts.value.filter(
-    (c) =>
-      c.status === 'delayed' ||
-      (c.status_label ?? '').toLowerCase().includes('retras'),
-  ).length
-})
-
 const totalPlannedPieces = computed(() => {
   return cuts.value.reduce((sum, c) => sum + (Number(c.total_pieces) || 0), 0)
 })
 
 const totalEffectivePieces = computed(() => {
   return cuts.value.reduce((sum, c) => {
-    const effective = (c as any).effective_pieces ?? c.total_pieces
-    return sum + (Number(effective) || 0)
+    return sum + (Number(c.total_pieces) || 0)
   }, 0)
 })
 
@@ -175,46 +165,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-dvh bg-slate-50">
-    <header class="sticky z-10 top-0 flex min-h-[4rem] items-center justify-between gap-3 px-4 py-2 bg-white/96 border-b border-slate-200 backdrop-blur-md">
-      <div class="flex items-center gap-3">
-        <img :src="logoUyn" alt="U&N Moda Infantil" class="w-13 h-12 object-contain" />
-        <div>
-          <span class="text-sm font-extrabold text-slate-900">ERP U&amp;N</span>
-          <small class="block text-slate-500 text-xs">Control de producción</small>
-        </div>
-      </div>
-
+  <div class="grid gap-5">
+    <!-- Welcome & Refresh Header -->
+    <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 border border-slate-200 rounded-xl shadow-xs">
       <div class="flex items-center gap-4">
-        <div class="hidden sm:grid text-right">
-          <strong class="text-sm text-slate-900 font-bold">{{ authStore.userName }}</strong>
-          <span class="text-xs text-brand-orange-800 font-bold">{{ authStore.primaryRole }}</span>
+        <div class="flex w-14 h-14 items-center justify-center text-brand-green-800 bg-brand-green-100 rounded-lg shrink-0">
+          <LayoutDashboard :size="28" aria-hidden="true" />
         </div>
-
-        <button
-          type="button"
-          class="inline-flex min-h-[2.5rem] items-center justify-center gap-2 px-3 text-red-700 bg-red-100/70 border border-red-700/20 rounded-md font-bold text-sm hover:bg-red-200/60 transition-colors cursor-pointer"
-          @click="handleLogout"
-        >
-          <LogOut :size="18" aria-hidden="true" />
-          <span>Cerrar sesión</span>
-        </button>
+        <div>
+          <p class="m-0 text-slate-500 text-xs font-bold uppercase tracking-wider">Supervisión operativa</p>
+          <h1 class="m-0 text-xl font-bold text-slate-900">Panel de Control de Producción</h1>
+          <span class="inline-block text-brand-orange-800 text-xs font-bold mt-0.5">Estado general del taller en tiempo real</span>
+        </div>
       </div>
-    </header>
-
-    <main class="w-[min(100%,90rem)] mx-auto p-4 py-5 grid gap-5">
-      <!-- Welcome & Refresh Header -->
-      <section class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-5 border border-slate-200 rounded-xl shadow-xs">
-        <div class="flex items-center gap-4">
-          <div class="flex w-14 h-14 items-center justify-center text-brand-green-800 bg-brand-green-100 rounded-lg shrink-0">
-            <LayoutDashboard :size="28" aria-hidden="true" />
-          </div>
-          <div>
-            <p class="m-0 text-slate-500 text-xs font-bold uppercase tracking-wider">Supervisión operativa</p>
-            <h1 class="m-0 text-xl font-bold text-slate-900">Panel de Control de Producción</h1>
-            <span class="inline-block text-brand-orange-800 text-xs font-bold mt-0.5">Estado general del taller en tiempo real</span>
-          </div>
-        </div>
 
         <button
           type="button"
@@ -497,6 +460,5 @@ onMounted(() => {
           </div>
         </div>
       </template>
-    </main>
-  </div>
+    </div>
 </template>

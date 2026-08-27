@@ -117,7 +117,7 @@ async function handleSubmit(): Promise<void> {
 
         <div>
           <p class="m-0 mb-2 text-brand-orange-800 text-xs font-extrabold tracking-wider uppercase">
-            Sistema de administración
+            Sistema de Administración y Control de Procesos (SACOP)
           </p>
 
           <h1 class="max-w-[35rem] m-0 text-slate-900 text-[clamp(2.2rem,4vw,4rem)] leading-[1.05] tracking-tight font-bold">
@@ -146,7 +146,7 @@ async function handleSubmit(): Promise<void> {
 
           <div>
             <p class="m-0 mb-2 text-brand-orange-800 text-xs font-extrabold tracking-wider uppercase">
-              ERP U&amp;N Moda Infantil
+              Sistema de Administración y Control de Procesos (SACOP)
             </p>
 
             <h2 class="m-0 text-slate-900 text-[clamp(1.65rem,6vw,2rem)] leading-tight font-bold">Iniciar sesión</h2>

@@ -88,8 +88,8 @@ async function handleLogout(): Promise<void> {
           />
 
           <div class="grid min-w-0">
-            <strong class="text-slate-900 text-base font-bold">ERP U&amp;N</strong>
-            <span class="text-slate-500 text-xs">Control de producción</span>
+            <strong class="text-slate-900 text-base font-bold">SACOP</strong>
+            <span class="text-slate-500 text-xs">Control de procesos</span>
           </div>
         </RouterLink>
 

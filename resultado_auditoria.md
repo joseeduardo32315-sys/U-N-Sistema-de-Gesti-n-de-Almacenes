@@ -1,4 +1,4 @@
-# Reporte de Auditoría de Alineación de Lógica - Frontend ERP "U&N Moda Infantil"
+# Reporte de Auditoría de Alineación de Lógica - Frontend SACOP (Sistema de Administración y Control de Procesos) "U&N Moda Infantil"
 
 Este reporte presenta los resultados de la auditoría técnica realizada al código del frontend (**uyn-frontend**), contrastándolo con las reglas de negocio críticas, requerimientos funcionales (RF), estándares de API y la arquitectura establecida.
 

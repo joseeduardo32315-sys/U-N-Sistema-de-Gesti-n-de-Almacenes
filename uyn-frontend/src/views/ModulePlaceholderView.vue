@@ -21,7 +21,7 @@ const description = computed<string>(() => {
   <section class="grid gap-5">
     <header class="max-w-[48rem]">
       <p class="m-0 mb-2 text-brand-orange-800 text-xs font-extrabold tracking-wider uppercase">
-        ERP U&amp;N Moda Infantil
+        Sistema de Administración y Control de Procesos (SACOP)
       </p>
 
       <h2 class="m-0 text-2xl sm:text-3xl font-bold text-slate-900">{{ title }}</h2>

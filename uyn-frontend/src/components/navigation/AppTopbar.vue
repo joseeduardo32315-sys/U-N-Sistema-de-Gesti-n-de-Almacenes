@@ -45,7 +45,7 @@ const initials = computed<string>(() => {
       </button>
 
       <div class="min-w-0">
-        <span class="hidden sm:block sm:mb-1 text-slate-500 text-xs">ERP U&amp;N Moda Infantil</span>
+        <span class="hidden sm:block sm:mb-1 text-slate-500 text-xs">Sistema de Administración y Control de Procesos (SACOP)</span>
         <h1 class="m-0 overflow-hidden text-lg leading-tight truncate text-slate-900 font-bold">{{ title }}</h1>
       </div>
     </div>

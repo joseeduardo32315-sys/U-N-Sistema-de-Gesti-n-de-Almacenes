@@ -18,7 +18,10 @@ const route = useRoute()
 const navigationOpen = ref(false)
 
 const pageTitle = computed<string>(() => {
-  return route.meta.title ?? 'ERP U&N Moda Infantil'
+  return (
+    route.meta.title ??
+    'Sistema de Administración y Control de Procesos (SACOP)'
+  )
 })
 
 function openNavigation(): void {
